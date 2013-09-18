@@ -3,6 +3,7 @@
 namespace MyCLabs\Work\Dispatcher;
 
 use MyCLabs\Work\Task\Task;
+use MyCLabs\Work\TaskExecutor\TaskExecutor;
 
 /**
  * Simple implementation not using any work queue: tasks are executed right away in the same process.
@@ -12,8 +13,7 @@ use MyCLabs\Work\Task\Task;
 class SimpleWorkDispatcher implements WorkDispatcher
 {
     /**
-     * Workers indexés par le nom de la tâche qu'ils traitent
-     * @var Worker[]
+     * @var TaskExecutor[]
      */
     private $workers = [];
 
@@ -22,17 +22,20 @@ class SimpleWorkDispatcher implements WorkDispatcher
      */
     public function runBackground(Task $task)
     {
-        $worker = $this->getWorker($task);
+        $worker = $this->getExecutor($task);
+
+        if (! $worker) {
+            throw new \Exception("No executor was configured for task of type " . get_class($task));
+        }
 
         $worker->execute($task);
     }
 
     /**
-     * Retourne le worker enregistré pour une tâche donnée
      * @param Task $task
-     * @return Worker|null
+     * @return TaskExecutor|null
      */
-    private function getWorker(Task $task)
+    private function getExecutor(Task $task)
     {
         $taskType = get_class($task);
 

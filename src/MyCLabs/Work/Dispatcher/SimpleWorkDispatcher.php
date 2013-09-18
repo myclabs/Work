@@ -32,6 +32,7 @@ class SimpleWorkDispatcher implements WorkDispatcher
 
     /**
      * {@inheritdoc}
+     * @return mixed This particular implementation can return the result since it's executed synchronously
      */
     public function runBackground(Task $task)
     {

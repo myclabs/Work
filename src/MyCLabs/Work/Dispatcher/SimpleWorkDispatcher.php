@@ -3,46 +3,38 @@
 namespace MyCLabs\Work\Dispatcher;
 
 use MyCLabs\Work\Task\Task;
-use MyCLabs\Work\TaskExecutor\TaskExecutor;
+use MyCLabs\Work\Worker\SimpleWorker;
 
 /**
  * Simple implementation not using any work queue: tasks are executed right away in the same process.
+ *
+ * @see SimpleWorker
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
 class SimpleWorkDispatcher implements WorkDispatcher
 {
     /**
-     * @var TaskExecutor[]
+     * @var SimpleWorker
      */
-    private $workers = [];
+    private $worker;
+
+    /**
+     * The SimpleWorkDispatcher executes task synchronously, so it needs to know the
+     * worker to be able to call it directly.
+     *
+     * @param SimpleWorker $simpleWorker
+     */
+    public function __construct(SimpleWorker $simpleWorker)
+    {
+        $this->worker = $simpleWorker;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function runBackground(Task $task)
     {
-        $worker = $this->getExecutor($task);
-
-        if (! $worker) {
-            throw new \Exception("No executor was configured for task of type " . get_class($task));
-        }
-
-        $worker->execute($task);
-    }
-
-    /**
-     * @param Task $task
-     * @return TaskExecutor|null
-     */
-    private function getExecutor(Task $task)
-    {
-        $taskType = get_class($task);
-
-        if (array_key_exists($taskType, $this->workers)) {
-            return $this->workers[$taskType];
-        }
-
-        return null;
+        return $this->worker->executeTask($task);
     }
 }

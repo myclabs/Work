@@ -34,7 +34,7 @@ class RabbitMQWorker extends Worker
     /**
      * {@inheritdoc}
      */
-    public function work()
+    public function work($count = null)
     {
         $callback = function($message) {
             $this->workHandler($message);
@@ -44,8 +44,12 @@ class RabbitMQWorker extends Worker
         $this->channel->basic_consume($this->queue, '', false, false, false, false, $callback);
 
         // Loop infinitely to execute tasks
-        while(count($this->channel->callbacks)) {
+        while (count($this->channel->callbacks) && (is_null($count) || ($count > 0))) {
             $this->channel->wait();
+
+            if (! is_null($count)) {
+                $count--;
+            }
         }
     }
 

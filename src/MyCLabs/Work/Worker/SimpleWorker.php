@@ -16,7 +16,7 @@ class SimpleWorker extends Worker
     /**
      * {@inheritdoc}
      */
-    public function work()
+    public function work($count = null)
     {
         // Nothing to do, there is no async worker in the "Simple" implementation
     }

@@ -20,8 +20,10 @@ abstract class Worker
 
     /**
      * Handle tasks that have been queued
+     *
+     * @param int $count Number of task to execute. If null, then loop infinitely
      */
-    public abstract function work();
+    public abstract function work($count = null);
 
     /**
      * Registers an executor that will handle task of a certain type.

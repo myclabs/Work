@@ -1,8 +1,8 @@
 # Work
 
-This library let's you run tasks in background using a distributed architecture.
+`Work` is a work queue library letting you run distributed tasks using a generic abstraction.
 
-It's intent is to be compatible with major Work Queue solutions (RabbitMQ, Gearman, …) while offering a high level abstraction.
+It's intent is to be compatible with major work queue solutions (RabbitMQ, Gearman, …) while offering a high level abstraction.
 
 
 Current implementations:

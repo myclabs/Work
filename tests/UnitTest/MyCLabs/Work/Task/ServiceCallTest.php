@@ -15,4 +15,13 @@ class ServiceCallTest extends PHPUnit_Framework_TestCase
         $this->assertSame('bar', $task->getMethodName());
         $this->assertSame([1, 2, 3], $task->getParameters());
     }
+
+    public function testSerialization()
+    {
+        $task = new ServiceCall('foo', 'bar', [1, 2, 3]);
+
+        $unserializedTask = unserialize(serialize($task));
+
+        $this->assertEquals($task, $unserializedTask);
+    }
 }

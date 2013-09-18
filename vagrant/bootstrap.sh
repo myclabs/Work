@@ -13,7 +13,7 @@ apt-key add rabbitmq-signing-key-public.asc
 
 apt-get update
 
-apt-get install -y curl git php5 php5-cli php-pear php5-xdebug rabbitmq-server
+apt-get install -y curl git php5-cli php-pear php5-xdebug rabbitmq-server
 
 # Composer
 curl -sS https://getcomposer.org/installer | php

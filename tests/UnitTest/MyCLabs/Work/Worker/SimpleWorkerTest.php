@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Task;
+namespace UnitTest\MyCLabs\Work\Worker;
 
 use MyCLabs\Work\Worker\SimpleWorker;
 use PHPUnit_Framework_TestCase;

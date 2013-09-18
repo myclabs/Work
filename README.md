@@ -12,6 +12,10 @@ Current implementations:
 
 Feel free to contribute and submit other implementations (Gearman, Beanstalkd, …).
 
+Extended guides:
+
+- [Use RabbitMQ with Work](doc/RabbitMQ.md)
+
 ## How it works
 
 In you code (HTTP request for example), you can run a task in background:
@@ -68,6 +72,7 @@ class BigComputationExecutor implements MyCLabs\Work\TaskExecutor\TaskExecutor
 You can run the tests with PHPUnit:
 
 ```shell
+$ composer install
 $ phpunit
 ```
 
@@ -78,5 +83,6 @@ very quickly using Vagrant and the included configuration. You can then run the 
 $ vagrant up
 $ vagrant ssh
 $ cd /vagrant
+$ composer install
 $ phpunit
 ```

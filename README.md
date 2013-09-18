@@ -1,84 +1,82 @@
-PHP-DI is a Container that makes [*Dependency Injection*](http://en.wikipedia.org/wiki/Dependency_injection)
-as practical as possible.
+# Work
 
-PHP-DI also tries to avoid falling into the trap of the "Service Locator" antipattern and help you do *real* dependency injection.
+This library let's you run tasks in background using a distributed architecture.
 
-[![Latest Stable Version](https://poser.pugx.org/mnapoli/php-di/v/stable.png)](https://packagist.org/packages/mnapoli/php-di) [![Total Downloads](https://poser.pugx.org/mnapoli/php-di/downloads.png)](https://packagist.org/packages/mnapoli/php-di)
-
-
-## Features
-
-* Simple to start with
-* Supports different configuration alternatives to suit every taste:
-    * **Reflection**: zero configuration, intelligent guessing
-    * **Annotations**: modern, practical and simple
-    * **PHP code**: if you like complete control and auto-completion
-    * **PHP array**: allows you to store it in a configuration file
-    * **YAML**: elegant and concise
-* **Performances**: supports a large number of Caches
-* Lazy injection: lazy-loading of dependencies
-* Supports constructor injection, setter injection and property injection
-* Easy integration with any framework with [Injection over an existing instance](doc/inject-on-instance.md)
+It's intent is to be compatible with major Work Queue solutions (RabbitMQ, Gearman, …) while offering a high level abstraction.
 
 
-## Usage
+Current implementations:
 
-Let's go to the [Getting started guide](doc/getting-started.md)!
+- Simple: synchronous implementation, task are executed directly (useful for tests or dev environments)
+- [RabbitMQ](http://www.rabbitmq.com/)
 
-And there is a [complete documentation](doc/) waiting for you.
+Feel free to contribute and submit other implementations (Gearman, Beanstalkd, …).
 
+## How it works
 
-## What is dependency injection, and why use PHP-DI
+In you code (HTTP request for example), you can run a task in background:
 
-You can first read the [introduction to dependency injection with an example](doc/example.md).
+```php
+$workDispatcher = new RabbitMQWorkDispatcher(/* parameters */);
+$workDispatcher->runBackground(new MyTask());
+```
 
-Dependency injection and DI containers are separate notions, and one should use of a container only if it makes things more practical (which is not always the case depending on the container you use).
+Separately, you set up a worker to run continuously on the command line (like a deamon):
 
-PHP-DI is about this: make dependency injection more practical.
+```shell
+$ php my-worker.php
+```
 
-### How classic PHP code works
+This worker simply calls:
 
-Here is how a code **not** using DI will roughly work:
+```php
+// my-worker.php
+$worker = new RabbitMQWorker(/* parameters */);
+// Will loop continuously and execute tasks
+$worker->work();
+```
 
-* Application needs Foo (e.g. a controller), so:
-* Application creates Foo
-* Application calls Foo
-    * Foo needs Bar (e.g. a service), so:
-    * Foo creates Bar
-    * Foo calls Bar
-        * Bar needs Bim (a service, a repository, …), so:
-        * Bar creates Bim
-        * Bar does something
+### Defining tasks
 
-### How Dependency Injection works
+Define a task:
 
-Here is how a code using DI will roughly work:
+```php
+class BigComputation implements MyCLabs\Work\Task\Task
+{
+    public $parameter1;
+}
+```
 
-* Application needs Foo, which needs Bar, which needs Bim, so:
-* Application creates Bim
-* Application creates Bar and gives it Bim
-* Application creates Foo and gives it Bar
-* Application calls Foo
-    * Foo calls Bar
-        * Bar does something
+And define the code that executes the task:
 
-This is the pattern of **Inversion of Control**. The control of the dependencies is **inversed** from one being called to the one calling.
+```php
+class BigComputationExecutor implements MyCLabs\Work\TaskExecutor\TaskExecutor
+{
+    public function execute(Task $task)
+    {
+        if (! $task instanceof BigComputation) {
+            throw new \Exception("Invalid task type provided");
+        }
+        // Perform the action (here we just multiply the parameter by 2)
+        return $task->parameter1 * 2;
+    }
+}
+```
 
-The main advantage: the one at the end of the caller chain is always **you**. So you can control every dependencies: you have a complete control on how your application works. You can replace a dependency by another (one you made for example).
+## Contributing
 
-For example that wouldn't be so easy if Library X uses Logger Y and you have to change the code of Library X to make it use your logger Z.
+You can run the tests with PHPUnit:
 
-### How code using PHP-DI works
+```shell
+$ phpunit
+```
 
-Now how does a code using PHP-DI works:
+Some functional tests need external programs like RabbitMQ. For practical reasons, you can boot a VM
+very quickly using Vagrant and the included configuration. You can then run the tests in the VM:
 
-* Application needs Foo so:
-* Application gets Foo from the Container, so:
-    * Container creates Bim
-    * Container creates Bar and gives it Bim
-    * Container creates Foo and gives it Bar
-* Application calls Foo
-    * Foo calls Bar
-        * Bar does something
-
-In short, PHP-DI takes away all the work of creating and injecting dependencies.
+```shell
+$ vagrant up
+$ vagrant ssh
+$ cd /vagrant
+$ phpunit
+```

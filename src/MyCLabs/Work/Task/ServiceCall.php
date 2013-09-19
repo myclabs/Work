@@ -59,4 +59,12 @@ class ServiceCall implements Task
     {
         return $this->parameters;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        return sprintf('%s %s::%s()', get_class(), $this->serviceName, $this->methodName);
+    }
 }

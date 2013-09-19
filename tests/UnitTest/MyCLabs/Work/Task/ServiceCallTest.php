@@ -24,4 +24,11 @@ class ServiceCallTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($task, $unserializedTask);
     }
+
+    public function testToString()
+    {
+        $task = new ServiceCall('foo', 'bar', [1, 2, 3]);
+
+        $this->assertSame('MyCLabs\Work\Task\ServiceCall foo::bar()', (string) $task);
+    }
 }

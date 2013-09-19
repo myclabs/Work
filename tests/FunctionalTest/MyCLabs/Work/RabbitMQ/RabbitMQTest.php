@@ -112,4 +112,8 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
 
 class FakeTask implements Task
 {
+    public function __toString()
+    {
+        return '';
+    }
 }

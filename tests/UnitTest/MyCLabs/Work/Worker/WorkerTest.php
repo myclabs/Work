@@ -72,4 +72,8 @@ class FakeWorker extends Worker
 
 class FakeTask implements Task
 {
+    public function __toString()
+    {
+        return '';
+    }
 }

@@ -12,17 +12,17 @@ class ServiceCall implements Task
     /**
      * @var string
      */
-    private $serviceName;
+    protected $serviceName;
 
     /**
      * @var string
      */
-    private $methodName;
+    protected $methodName;
 
     /**
      * @var array
      */
-    private $parameters;
+    protected $parameters;
 
     /**
      * @param string $serviceName Name of the service class

@@ -1,6 +1,6 @@
 # Work
 
-[![Build Status](https://travis-ci.org/myclabs/Work.png?branch=master)](https://travis-ci.org/myclabs/Work)
+[![Build Status](https://travis-ci.org/myclabs/Work.png?branch=master)](https://travis-ci.org/myclabs/Work) [![Coverage Status](https://coveralls.io/repos/myclabs/Work/badge.png?branch=master)](https://coveralls.io/r/myclabs/Work?branch=master)
 
 `Work` is a work queue library letting you run distributed tasks using a generic abstraction.
 

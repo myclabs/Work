@@ -28,6 +28,17 @@ class ServiceCallExecutorTest extends PHPUnit_Framework_TestCase
         // Check that the result is returned
         $this->assertSame('Hello World', $result);
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid task type provided
+     */
+    public function testInvalidTaskType()
+    {
+        $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
+        $executor = new ServiceCallExecutor(new \stdClass());
+        $executor->execute($task);
+    }
 }
 
 /**

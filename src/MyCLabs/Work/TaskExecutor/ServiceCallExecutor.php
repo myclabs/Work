@@ -2,6 +2,7 @@
 
 namespace MyCLabs\Work\TaskExecutor;
 
+use InvalidArgumentException;
 use MyCLabs\Work\Task\ServiceCall;
 use MyCLabs\Work\Task\Task;
 
@@ -29,7 +30,7 @@ class ServiceCallExecutor implements TaskExecutor
     public function execute(Task $task)
     {
         if (! $task instanceof ServiceCall) {
-            throw new \Exception("Invalid task type provided");
+            throw new InvalidArgumentException("Invalid task type provided");
         }
 
         $serviceName = $task->getServiceName();

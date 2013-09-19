@@ -1,5 +1,7 @@
 # Work
 
+[![Build Status](https://travis-ci.org/myclabs/Work.png?branch=master)](https://travis-ci.org/myclabs/Work)
+
 `Work` is a work queue library letting you run distributed tasks using a generic abstraction.
 
 It's intent is to be compatible with major work queue solutions (RabbitMQ, Gearman, …) while offering a high level abstraction.

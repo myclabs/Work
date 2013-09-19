@@ -2,6 +2,7 @@
 
 namespace MyCLabs\Work\Worker;
 
+use Exception;
 use MyCLabs\Work\Task\Task;
 use PhpAmqpLib\Channel\AMQPChannel;
 
@@ -67,10 +68,25 @@ class RabbitMQWorker extends Worker
         /** @var Task $task */
         $task = unserialize($message->body);
 
-        // Execute the task
-        $this->getExecutor($task)->execute($task);
+        try {
+            // Event: before
+            $this->triggerEvent(self::EVENT_BEFORE_TASK_EXECUTION, [$task]);
 
-        // Send ACK signaling the task execution is over
-        $channel->basic_ack($message->delivery_info['delivery_tag']);
+            // Execute the task
+            $this->getExecutor($task)->execute($task);
+
+            // Event: after
+            $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task]);
+
+            // Send ACK signaling the task execution is over
+            $channel->basic_ack($message->delivery_info['delivery_tag']);
+
+        } catch (Exception $e) {
+            // Event: error
+            $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [$task, $e]);
+
+            // Signal the task execution has failed
+            $channel->basic_reject($message->delivery_info['delivery_tag'], false);
+        }
     }
 }

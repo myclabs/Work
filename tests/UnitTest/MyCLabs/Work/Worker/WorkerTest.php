@@ -40,4 +40,36 @@ class WorkerTest extends PHPUnit_Framework_TestCase
 
         $worker->getExecutor($task);
     }
+
+    public function testEventListener()
+    {
+        $listener = $this->getMock('MyCLabs\Work\Worker\EventListener');
+
+        // Check that event methods are called
+        $listener->expects($this->once())
+            ->method('beforeTaskExecution');
+        $listener->expects($this->once())
+            ->method('onTaskSuccess');
+        $listener->expects($this->once())
+            ->method('onTaskException');
+
+        $worker = new FakeWorker();
+
+        $worker->addEventListener($listener);
+        $worker->work();
+    }
+}
+
+class FakeWorker extends Worker
+{
+    public function work($count = null)
+    {
+        $this->triggerEvent(self::EVENT_BEFORE_TASK_EXECUTION, [new FakeTask()]);
+        $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [new FakeTask()]);
+        $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [new FakeTask(), new \Exception()]);
+    }
+}
+
+class FakeTask implements Task
+{
 }

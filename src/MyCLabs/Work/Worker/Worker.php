@@ -13,10 +13,30 @@ use MyCLabs\Work\TaskExecutor\TaskExecutor;
 abstract class Worker
 {
     /**
+     * Event: before a task is executed.
+     */
+    const EVENT_BEFORE_TASK_EXECUTION = 'beforeTaskExecution';
+
+    /**
+     * Event: when a task is executed successfully.
+     */
+    const EVENT_ON_TASK_SUCCESS = 'onTaskSuccess';
+
+    /**
+     * Event: when a task was executed but threw an exception.
+     */
+    const EVENT_ON_TASK_EXCEPTION = 'onTaskException';
+
+    /**
      * Executors indexed by task name.
      * @var TaskExecutor[]
      */
     private $executors = [];
+
+    /**
+     * @var EventListener[]
+     */
+    private $listeners = [];
 
     /**
      * Handle tasks that have been queued
@@ -53,5 +73,26 @@ abstract class Worker
         }
 
         throw new \Exception("No executor was configured for task of type " . get_class($task));
+    }
+
+    /**
+     * @param EventListener $listener
+     */
+    public function addEventListener(EventListener $listener)
+    {
+        $this->listeners[] = $listener;
+    }
+
+    /**
+     * Dispatch an event to all the listeners.
+     *
+     * @param string $event
+     * @param array  $parameters
+     */
+    protected function triggerEvent($event, array $parameters = [])
+    {
+        foreach ($this->listeners as $listener) {
+            call_user_func_array([$listener, $event], $parameters);
+        }
     }
 }

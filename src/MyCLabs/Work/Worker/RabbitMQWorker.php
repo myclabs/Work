@@ -4,7 +4,6 @@ namespace MyCLabs\Work\Worker;
 
 use MyCLabs\Work\Task\Task;
 use PhpAmqpLib\Channel\AMQPChannel;
-use Psr\Log\LoggerInterface;
 
 /**
  * RabbitMQ implementation.

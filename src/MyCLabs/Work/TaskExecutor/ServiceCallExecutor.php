@@ -4,7 +4,6 @@ namespace MyCLabs\Work\TaskExecutor;
 
 use MyCLabs\Work\Task\ServiceCall;
 use MyCLabs\Work\Task\Task;
-use Psr\Log\LoggerInterface;
 
 /**
  * Calls the method of a service.

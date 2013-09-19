@@ -16,15 +16,9 @@ class ServiceCallExecutor implements TaskExecutor
     private $serviceLocator;
 
     /**
-     * @var LoggerInterface|null
+     * @param mixed $serviceLocator Container/Service locator, must implement get($serviceName) method
      */
-    private $logger;
-
-    /**
-     * @param mixed           $serviceLocator Container/Service locator, must implement get($serviceName) method
-     * @param LoggerInterface $logger If null, no logging
-     */
-    public function __construct($serviceLocator, LoggerInterface $logger = null)
+    public function __construct($serviceLocator)
     {
         $this->serviceLocator = $serviceLocator;
     }
@@ -45,10 +39,6 @@ class ServiceCallExecutor implements TaskExecutor
 
         // Get the service from the service locator
         $service = $this->serviceLocator->get($serviceName);
-
-        if ($this->logger) {
-            $this->logger->debug("ServiceCallExecutor: Calling {0}::{1}", [$serviceName, $methodName]);
-        }
 
         $return = call_user_func_array([$service, $methodName], $parameters);
 

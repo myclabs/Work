@@ -2,7 +2,9 @@
 
 namespace MyCLabs\Work\Worker;
 
+use MyCLabs\Work\Task\Task;
 use PhpAmqpLib\Channel\AMQPChannel;
+use Psr\Log\LoggerInterface;
 
 /**
  * RabbitMQ implementation.
@@ -43,7 +45,7 @@ class RabbitMQWorker extends Worker
         $this->channel->basic_qos(null, 1, null);
         $this->channel->basic_consume($this->queue, '', false, false, false, false, $callback);
 
-        // Loop infinitely to execute tasks
+        // Loop infinitely (or up to $count) to execute tasks
         while (count($this->channel->callbacks) && (is_null($count) || ($count > 0))) {
             $this->channel->wait();
 
@@ -63,6 +65,7 @@ class RabbitMQWorker extends Worker
         /** @var AMQPChannel $channel */
         $channel = $message->delivery_info['channel'];
 
+        /** @var Task $task */
         $task = unserialize($message->body);
 
         // Execute the task

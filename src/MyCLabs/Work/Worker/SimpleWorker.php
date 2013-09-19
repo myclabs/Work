@@ -2,6 +2,7 @@
 
 namespace MyCLabs\Work\Worker;
 
+use Exception;
 use MyCLabs\Work\Task\Task;
 
 /**
@@ -25,12 +26,28 @@ class SimpleWorker extends Worker
      * Synchronously execute a task.
      *
      * @param Task $task
+     * @throws \Exception
      * @return mixed Result
      */
     public function executeTask(Task $task)
     {
-        $executor = $this->getExecutor($task);
+        try {
+            // Event: before
+            $this->triggerEvent(self::EVENT_BEFORE_TASK_EXECUTION, [$task]);
 
-        return $executor->execute($task);
+            // Execute the task
+            $result = $this->getExecutor($task)->execute($task);
+
+            // Event: after
+            $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task]);
+
+            return $result;
+        } catch (Exception $e) {
+            // Event: error
+            $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [$task, $e]);
+
+            // Rethrow the exception
+            throw $e;
+        }
     }
 }

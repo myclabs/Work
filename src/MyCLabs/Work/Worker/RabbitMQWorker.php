@@ -70,6 +70,9 @@ class RabbitMQWorker extends Worker
 
         try {
             // Event: before
+            $this->triggerEvent(self::EVENT_AFTER_TASK_UNSERIALIZATION, [$task]);
+
+            // Event: before
             $this->triggerEvent(self::EVENT_BEFORE_TASK_EXECUTION, [$task]);
 
             // Execute the task

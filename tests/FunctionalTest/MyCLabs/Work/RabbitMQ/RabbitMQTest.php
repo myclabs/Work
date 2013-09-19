@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Dispatcher;
+namespace FunctionalTest\MyCLabs\Work\RabbitMQ;
 
 use MyCLabs\Work\Dispatcher\RabbitMQWorkDispatcher;
 use MyCLabs\Work\Task\Task;
@@ -59,7 +59,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $worker = new RabbitMQWorker($this->channel, self::QUEUE_NAME);
 
         // Check that event methods are called
-        $listener = $this->getMock('MyCLabs\Work\Worker\EventListener');
+        $listener = $this->getMock('MyCLabs\Work\EventListener');
         $listener->expects($this->once())
             ->method('beforeTaskExecution');
         $listener->expects($this->once())
@@ -90,7 +90,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $worker = new RabbitMQWorker($this->channel, self::QUEUE_NAME);
 
         // Check that event methods are called
-        $listener = $this->getMock('MyCLabs\Work\Worker\EventListener');
+        $listener = $this->getMock('MyCLabs\Work\EventListener');
         $listener->expects($this->once())
             ->method('beforeTaskExecution');
         $listener->expects($this->once())

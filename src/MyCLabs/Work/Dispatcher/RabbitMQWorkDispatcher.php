@@ -11,7 +11,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class RabbitMQWorkDispatcher implements WorkDispatcher
+class RabbitMQWorkDispatcher extends WorkDispatcher
 {
     /**
      * @var AMQPChannel
@@ -38,6 +38,9 @@ class RabbitMQWorkDispatcher implements WorkDispatcher
      */
     public function runBackground(Task $task)
     {
+        // Event: before serialization
+        $this->triggerEvent(self::EVENT_BEFORE_TASK_SERIALIZATION, [$task]);
+
         $message = new AMQPMessage(
             serialize($task),
             [

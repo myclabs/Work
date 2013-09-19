@@ -12,7 +12,7 @@ use MyCLabs\Work\Worker\SimpleWorker;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class SimpleWorkDispatcher implements WorkDispatcher
+class SimpleWorkDispatcher extends WorkDispatcher
 {
     /**
      * @var SimpleWorker

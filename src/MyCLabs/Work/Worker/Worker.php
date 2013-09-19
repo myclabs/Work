@@ -2,6 +2,7 @@
 
 namespace MyCLabs\Work\Worker;
 
+use MyCLabs\Work\EventListener;
 use MyCLabs\Work\Task\Task;
 use MyCLabs\Work\TaskExecutor\TaskExecutor;
 
@@ -12,6 +13,11 @@ use MyCLabs\Work\TaskExecutor\TaskExecutor;
  */
 abstract class Worker
 {
+    /**
+     * Event: after a task is unserialized.
+     */
+    const EVENT_AFTER_TASK_UNSERIALIZATION = 'afterTaskUnserialization';
+
     /**
      * Event: before a task is executed.
      */

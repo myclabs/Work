@@ -15,6 +15,7 @@ Feel free to contribute and submit other implementations (Gearman, Beanstalkd, â
 Extended guides:
 
 - [Use RabbitMQ with Work](doc/RabbitMQ.md)
+- [Listening to events](doc/Events.md)
 
 ## How it works
 

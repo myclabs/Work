@@ -36,6 +36,9 @@ class SimpleWorkDispatcher extends WorkDispatcher
      */
     public function runBackground(Task $task)
     {
+        // Event: before dispatching the task
+        $this->triggerEvent(self::EVENT_BEFORE_TASK_DISPATCHED, [$task]);
+
         return $this->worker->executeTask($task);
     }
 }

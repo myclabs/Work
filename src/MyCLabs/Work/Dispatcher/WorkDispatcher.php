@@ -13,6 +13,11 @@ use MyCLabs\Work\Task\Task;
 abstract class WorkDispatcher
 {
     /**
+     * Event: before a task is dispatched to be run by a worker.
+     */
+    const EVENT_BEFORE_TASK_DISPATCHED = 'beforeTaskDispatched';
+
+    /**
      * Event: before a task is serialized.
      */
     const EVENT_BEFORE_TASK_SERIALIZATION = 'beforeTaskSerialization';

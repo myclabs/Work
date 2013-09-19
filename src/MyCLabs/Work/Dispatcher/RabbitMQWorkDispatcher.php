@@ -38,6 +38,9 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
      */
     public function runBackground(Task $task)
     {
+        // Event: before dispatching the task
+        $this->triggerEvent(self::EVENT_BEFORE_TASK_DISPATCHED, [$task]);
+
         // Event: before serialization
         $this->triggerEvent(self::EVENT_BEFORE_TASK_SERIALIZATION, [$task]);
 

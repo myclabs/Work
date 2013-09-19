@@ -7,6 +7,18 @@ db connections, …), you can implement the EventListener abstract class:
 class MyEventListener extends MyCLabs\Work\EventListener
 {
     /**
+     * Event called before a task is dispatched to be run by a worker.
+     *
+     * You can use this event to prepare the task to be sent.
+     *
+     * @param Task $task
+     */
+    public function beforeTaskDispatched(Task $task)
+    {
+        // ...
+    }
+
+    /**
      * Event called before a task is serialized.
      *
      * You can use this event to prepare the task to be serialized.

@@ -61,7 +61,9 @@ class ServiceCall implements Task
     }
 
     /**
-     * {@inheritdoc}
+     * Useful for logging and debugging.
+     *
+     * @return string
      */
     public function __toString()
     {

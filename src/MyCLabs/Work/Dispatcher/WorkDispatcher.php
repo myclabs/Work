@@ -28,12 +28,25 @@ abstract class WorkDispatcher
     private $listeners = [];
 
     /**
-     * Run a task in background
+     * Run a task in background.
      *
-     * @param Task $task
+     * You can use $wait to wait a given time for the task to complete.
+     * If the task hasn't finished during this time, $timedout will be called and this method will return.
+     * If the task has finished, $completed will be called.
+     *
+     * @param Task     $task
+     * @param int      $wait      Number of seconds to wait for the task to complete. If 0, doesn't wait.
+     * @param callable $completed Called (if $wait > 0) when the task has completed.
+     * @param callable $timedout  Called if we hit the timeout while waiting.
+     * @todo handler for error
      * @return void No results
      */
-    public abstract function runBackground(Task $task);
+    public abstract function runBackground(
+        Task $task,
+        $wait = 0,
+        callable $completed = null,
+        callable $timedout = null
+    );
 
     /**
      * @param EventListener $listener

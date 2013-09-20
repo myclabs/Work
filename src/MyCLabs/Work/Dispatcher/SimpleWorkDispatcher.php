@@ -32,13 +32,24 @@ class SimpleWorkDispatcher extends WorkDispatcher
 
     /**
      * {@inheritdoc}
+     * This implementation is synchronous, so it will wait for the task to complete.
+     *
      * @return mixed This particular implementation can return the result since it's executed synchronously
      */
-    public function runBackground(Task $task)
-    {
-        // Event: before dispatching the task
+    public function runBackground(
+        Task $task,
+        $wait = 0,
+        callable $completed = null,
+        callable $timedout = null
+    ) {
         $this->triggerEvent(self::EVENT_BEFORE_TASK_DISPATCHED, [$task]);
 
-        return $this->worker->executeTask($task);
+        $result = $this->worker->executeTask($task);
+
+        if ($completed !== null) {
+            call_user_func($completed);
+        }
+
+        return $result;
     }
 }

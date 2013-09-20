@@ -36,21 +36,99 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
     /**
      * {@inheritdoc}
      */
-    public function runBackground(Task $task)
-    {
+    public function runBackground(
+        Task $task,
+        $wait = 0,
+        callable $completed = null,
+        callable $timedout = null
+    ) {
+        $waitForResult = ($wait > 0);
+
         // Event: before dispatching the task
         $this->triggerEvent(self::EVENT_BEFORE_TASK_DISPATCHED, [$task]);
 
         // Event: before serialization
         $this->triggerEvent(self::EVENT_BEFORE_TASK_SERIALIZATION, [$task]);
 
-        $message = new AMQPMessage(
-            serialize($task),
-            [
-                'delivery_mode' => 2, // make message persistent
-            ]
-        );
+        $messageOptions = [
+            'delivery_mode' => 2, // make message persistent
+        ];
+
+        $replyQueue = null;
+        if ($waitForResult) {
+            // Create a temporary queue for the exchange
+            list($replyQueue, ,) = $this->channel->queue_declare('', false, false, true, false);
+            $messageOptions['reply_to'] = $replyQueue;
+        }
+
+        $message = new AMQPMessage(serialize($task), $messageOptions);
 
         $this->channel->basic_publish($message, '', $this->queue);
+
+        if ($waitForResult) {
+            $this->waitForTask($wait, $replyQueue, $completed, $timedout);
+        }
+    }
+
+    private function waitForTask($timeout, $queue, callable $completed = null, callable $timedout = null)
+    {
+        // Wait X seconds for the task to be finished
+        $message = $this->waitForMessage($queue, $timeout);
+
+        // No response from the worker (the task is not finished)
+        if (! $message) {
+            // We put in the queue that we timed out
+            $this->channel->basic_publish(new AMQPMessage('timeout'), '', $queue);
+
+            // Read the first message coming out of the queue
+            $message = $this->waitForMessage($queue, 0.5);
+
+            if (! $message) {
+                // Shouldn't happen -> error while delivering messages?
+                return;
+            }
+        }
+
+        // If the first message of the queue is a "finished" message from the worker
+        if ($message->body == 'finished') {
+            if ($completed !== null) {
+                call_user_func($completed);
+            }
+            // Delete the temporary queue
+            $this->channel->queue_delete($queue);
+        }
+
+        // If the first message of the queue is our "timeout" message
+        if ($message->body == 'timeout') {
+            if ($timedout !== null) {
+                call_user_func($timedout);
+            }
+        }
+    }
+
+    /**
+     * Read a queue until there's a message or until a timeout.
+     *
+     * @param string $queue
+     * @param int    $timeout Time to wait in seconds
+     * @return AMQPMessage|null
+     */
+    private function waitForMessage($queue, $timeout)
+    {
+        $timeStart = microtime(true);
+
+        do {
+            // Get message and auto-ack
+            $response = $this->channel->basic_get($queue);
+            if ($response) {
+                return $response;
+            }
+
+            // Sleep 300 ms
+            usleep(300000);
+            $timeSpent = microtime(true) - $timeStart;
+        } while ($timeSpent < $timeout);
+
+        return null;
     }
 }

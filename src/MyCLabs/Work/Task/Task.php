@@ -11,10 +11,4 @@ namespace MyCLabs\Work\Task;
  */
 interface Task
 {
-    /**
-     * Return a string representation of the task, useful for logging and debugging.
-     *
-     * @return string
-     */
-    public function __toString();
 }

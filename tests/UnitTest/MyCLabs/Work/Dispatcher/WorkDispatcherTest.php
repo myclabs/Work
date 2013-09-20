@@ -26,8 +26,12 @@ class WorkDispatcherTest extends PHPUnit_Framework_TestCase
 
 class FakeWorkDispatcher extends WorkDispatcher
 {
-    public function runBackground(Task $task)
-    {
+    public function runBackground(
+        Task $task,
+        $wait = 0,
+        callable $completed = null,
+        callable $timedout = null
+    ) {
         $this->triggerEvent(self::EVENT_BEFORE_TASK_SERIALIZATION, [$task]);
     }
 }

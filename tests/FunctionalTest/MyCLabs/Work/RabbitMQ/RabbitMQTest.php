@@ -42,11 +42,12 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        $this->channel->queue_delete(self::QUEUE_NAME);
         $this->channel->close();
         $this->connection->close();
     }
 
-    public function testRunBackground()
+    public function testSimpleRunBackground()
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, self::QUEUE_NAME);
 
@@ -55,7 +56,6 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $workDispatcher->runBackground($task);
 
         // Run the worker to execute the task
-
         $worker = new RabbitMQWorker($this->channel, self::QUEUE_NAME);
 
         // Check that event methods are called
@@ -86,7 +86,6 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $workDispatcher->runBackground($task);
 
         // Run the worker to execute the task
-
         $worker = new RabbitMQWorker($this->channel, self::QUEUE_NAME);
 
         // Check that event methods are called
@@ -108,12 +107,23 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         // Work
         $worker->work(1);
     }
+
+    /**
+     * Test that if we wait for a task and it times out, the callback is called
+     */
+    public function testRunBackgroundWithTimeout()
+    {
+        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, self::QUEUE_NAME);
+
+        $mock = $this->getMock('stdClass', ['callback']);
+        $mock->expects($this->once())
+            ->method('callback');
+
+        // Pile up a task to execute and let it timeout
+        $workDispatcher->runBackground(new FakeTask(), 0.01, null, [$mock, 'callback']);
+    }
 }
 
 class FakeTask implements Task
 {
-    public function __toString()
-    {
-        return '';
-    }
 }

@@ -3,7 +3,6 @@
 namespace FunctionalTest\MyCLabs\Work\RabbitMQ;
 
 use MyCLabs\Work\Dispatcher\RabbitMQWorkDispatcher;
-use MyCLabs\Work\Task\Task;
 use MyCLabs\Work\Worker\RabbitMQWorker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
@@ -15,7 +14,7 @@ use PHPUnit_Framework_TestCase;
  */
 class RabbitMQTest extends PHPUnit_Framework_TestCase
 {
-    const QUEUE_NAME = 'myclabs_work_test';
+    const QUEUE_PREFIX = 'myclabs_work_test';
 
     /**
      * @var AMQPConnection
@@ -27,6 +26,11 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
      */
     private $channel;
 
+    /**
+     * @var string
+     */
+    private $queue;
+
     public function setUp()
     {
         try {
@@ -36,27 +40,28 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             $this->markTestSkipped('RabbitMQ is not installed or was not found');
             return;
         }
+        $this->queue = self::QUEUE_PREFIX . '_' . rand();
         $this->channel = $this->connection->channel();
-        $this->channel->queue_declare(self::QUEUE_NAME, false, false, false, false);
+        $this->channel->queue_declare($this->queue, false, false, false, false);
     }
 
     public function tearDown()
     {
-        $this->channel->queue_delete(self::QUEUE_NAME);
+        $this->channel->queue_delete($this->queue);
         $this->channel->close();
         $this->connection->close();
     }
 
     public function testSimpleRunBackground()
     {
-        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, self::QUEUE_NAME);
+        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
         // Pile up a task to execute
         $task = new FakeTask();
         $workDispatcher->runBackground($task);
 
         // Run the worker to execute the task
-        $worker = new RabbitMQWorker($this->channel, self::QUEUE_NAME);
+        $worker = new RabbitMQWorker($this->channel, $this->queue);
 
         // Check that event methods are called
         $listener = $this->getMock('MyCLabs\Work\EventListener');
@@ -79,14 +84,14 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
 
     public function testRunBackgroundWithException()
     {
-        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, self::QUEUE_NAME);
+        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
         // Pile up a task to execute
         $task = new FakeTask();
         $workDispatcher->runBackground($task);
 
         // Run the worker to execute the task
-        $worker = new RabbitMQWorker($this->channel, self::QUEUE_NAME);
+        $worker = new RabbitMQWorker($this->channel, $this->queue);
 
         // Check that event methods are called
         $listener = $this->getMock('MyCLabs\Work\EventListener');
@@ -113,7 +118,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
      */
     public function testRunBackgroundWithTimeout()
     {
-        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, self::QUEUE_NAME);
+        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
         $mock = $this->getMock('stdClass', ['callback']);
         $mock->expects($this->once())
@@ -122,8 +127,23 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         // Pile up a task to execute and let it timeout
         $workDispatcher->runBackground(new FakeTask(), 0.01, null, [$mock, 'callback']);
     }
-}
 
-class FakeTask implements Task
-{
+    /**
+     * Test that if we wait for a task and it times out, the callback is called
+     */
+    public function testRunBackgroundWithWait()
+    {
+        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
+
+        // Run the worker as background task
+        $file = __DIR__ . '/worker.php';
+        $log = __DIR__ . '/worker.log';
+        exec("php $file {$this->queue} > $log 2> $log &");
+
+        $mock = $this->getMock('stdClass', ['callback']);
+        $mock->expects($this->once())
+            ->method('callback');
+
+        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'callback']);
+    }
 }

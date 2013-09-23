@@ -54,11 +54,15 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
             'delivery_mode' => 2, // make message persistent
         ];
 
+        $replyExchange = null;
         $replyQueue = null;
         if ($waitForResult) {
-            // Create a temporary queue for the exchange
-            list($replyQueue, ,) = $this->channel->queue_declare('', false, false, true, false);
-            $messageOptions['reply_to'] = $replyQueue;
+            // Create a temporary exchange and queue for communicating with the worker
+            $replyExchange = uniqid('tmp');
+            $this->channel->exchange_declare($replyExchange, 'fanout');
+            list($replyQueue, ,) = $this->channel->queue_declare('', false, false, true);
+            $this->channel->queue_bind($replyQueue, $replyExchange);
+            $messageOptions['reply_to'] = $replyExchange;
         }
 
         $message = new AMQPMessage(serialize($task), $messageOptions);
@@ -66,11 +70,11 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
         $this->channel->basic_publish($message, '', $this->queue);
 
         if ($waitForResult) {
-            $this->waitForTask($wait, $replyQueue, $completed, $timedout);
+            $this->waitForTask($wait, $replyExchange, $replyQueue, $completed, $timedout);
         }
     }
 
-    private function waitForTask($timeout, $queue, callable $completed = null, callable $timedout = null)
+    private function waitForTask($timeout, $exchange, $queue, callable $completed = null, callable $timedout = null)
     {
         // Wait X seconds for the task to be finished
         $message = $this->waitForMessage($queue, $timeout);
@@ -78,7 +82,7 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
         // No response from the worker (the task is not finished)
         if (! $message) {
             // We put in the queue that we timed out
-            $this->channel->basic_publish(new AMQPMessage('timeout'), '', $queue);
+            $this->channel->basic_publish(new AMQPMessage('timeout'), $exchange);
 
             // Read the first message coming out of the queue
             $message = $this->waitForMessage($queue, 0.5);
@@ -94,8 +98,8 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
             if ($completed !== null) {
                 call_user_func($completed);
             }
-            // Delete the temporary queue
-            $this->channel->queue_delete($queue);
+            // Delete the temporary exchange
+            $this->channel->exchange_delete($exchange);
         }
 
         // If the first message of the queue is our "timeout" message
@@ -103,7 +107,11 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
             if ($timedout !== null) {
                 call_user_func($timedout);
             }
+            // Do not delete the temp exchange: still used by the worker
         }
+
+        // Delete the temporary queue
+        $this->channel->queue_delete($queue);
     }
 
     /**

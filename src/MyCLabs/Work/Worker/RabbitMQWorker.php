@@ -66,6 +66,15 @@ class RabbitMQWorker extends Worker
         /** @var AMQPChannel $channel */
         $channel = $message->delivery_info['channel'];
 
+        // Listen to the "reply_to" exchange
+        $replyExchange = null;
+        $replyQueue = null;
+        if ($message->has('reply_to')) {
+            $replyExchange = $message->get('reply_to');
+            list($replyQueue, ,) = $this->channel->queue_declare('', false, false, true);
+            $this->channel->queue_bind($replyQueue, $replyExchange);
+        }
+
         /** @var Task $task */
         $task = unserialize($message->body);
 
@@ -78,32 +87,34 @@ class RabbitMQWorker extends Worker
             $this->getExecutor($task)->execute($task);
 
             $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task]);
-
-            // Send ACK signaling the task execution is over
-            $channel->basic_ack($message->delivery_info['delivery_tag']);
-
-            // If the emitter wants a reply, we reply
-            if ($message->has('reply_to')) {
-                $this->signalSuccess($message->get('reply_to'));
-            }
-
         } catch (Exception $e) {
             $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [$task, $e]);
 
             // Signal the task execution has failed
             $channel->basic_reject($message->delivery_info['delivery_tag'], false);
+
+            return;
+        }
+
+        // Send ACK signaling the task execution is over
+        $channel->basic_ack($message->delivery_info['delivery_tag']);
+
+        // If the emitter wants a reply, we reply
+        if ($replyExchange) {
+            $this->signalSuccess($replyExchange, $replyQueue);
         }
     }
 
     /**
      * Signal to the emitter of the task that we finished.
      *
+     * @param string $exchange
      * @param string $queue
      */
-    private function signalSuccess($queue)
+    private function signalSuccess($exchange, $queue)
     {
         // We put in the queue that we finished
-        $this->channel->basic_publish(new AMQPMessage('finished'), '', $queue);
+        $this->channel->basic_publish(new AMQPMessage('finished'), $exchange);
 
         // Read the first message coming out of the queue
         $message = $this->waitForMessage($queue, 0.5);
@@ -115,13 +126,17 @@ class RabbitMQWorker extends Worker
 
         // If the first message of the queue is a "timeout" message from the emitter
         if ($message->body == 'timeout') {
-            // Delete the temporary queue
-            $this->channel->queue_delete($queue);
+            // Delete the temporary exchange
+            $this->channel->exchange_delete($exchange);
         }
 
         // If the first message of the queue is our "finished" message, we can die in peace
         if ($message->body == 'finished') {
+            // Do not delete the temp exchange: still used by the app
         }
+
+        // Delete the temporary queue
+        $this->channel->queue_delete($queue);
     }
 
     /**

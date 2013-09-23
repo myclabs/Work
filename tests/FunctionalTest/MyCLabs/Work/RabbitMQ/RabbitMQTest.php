@@ -170,7 +170,70 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         // Run the task dispatcher as background task (it will emit 1 task and wait for it)
         $file = __DIR__ . '/dispatch-task.php';
         $log = __DIR__ . '/dispatch-task.log';
-        exec("php $file {$this->queue} > $log 2> $log &");
+        $wait = 1;
+        exec("php $file {$this->queue} $wait > $log 2> $log &");
+
+        // Check that the events are called
+        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener->expects($this->once())
+            ->method('afterTaskUnserialization');
+        $listener->expects($this->once())
+            ->method('beforeTaskExecution');
+        $listener->expects($this->once())
+            ->method('beforeTaskFinished');
+        $listener->expects($this->once())
+            ->method('onTaskSuccess')
+            // Check that $dispatcherNotified = true
+            ->with($this->anything(), true);
+        $listener->expects($this->never())
+            ->method('onTaskException');
+        $worker->addEventListener($listener);
+
+        // Execute 1 task
+        $worker->work(1);
+
+        // Check that the log is empty (no error)
+        $this->assertStringEqualsFile($log, '');
+    }
+
+    /**
+     * Test the Worker with waiting for the job to complete, except the Dispatcher timeout and stop waiting.
+     * The worker executes a task in 500ms, the dispatcher wait for 1ms.
+     */
+    public function testWorkWithWaitDispatcherTimeout()
+    {
+        $worker = new RabbitMQWorker($this->channel, $this->queue);
+        $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
+        $taskExecutor->expects($this->once())
+            ->method('execute')
+            ->will($this->returnCallback(function() {
+                        // The task executes in 500ms
+                        usleep(500000);
+                    }));
+        $worker->registerTaskExecutor('FunctionalTest\MyCLabs\Work\RabbitMQ\FakeTask', $taskExecutor);
+
+        // Run the task dispatcher as background task (it will emit 1 task and wait for it)
+        $file = __DIR__ . '/dispatch-task.php';
+        $log = __DIR__ . '/dispatch-task.log';
+        // The worker waits for 1ms
+        $wait = 0.001;
+        exec("php $file {$this->queue} $wait > $log 2> $log &");
+
+        // Check that the events are called
+        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener->expects($this->once())
+            ->method('afterTaskUnserialization');
+        $listener->expects($this->once())
+            ->method('beforeTaskExecution');
+        $listener->expects($this->once())
+            ->method('beforeTaskFinished');
+        $listener->expects($this->once())
+            ->method('onTaskSuccess')
+            // Check that $dispatcherNotified = false
+            ->with($this->anything(), false);
+        $listener->expects($this->never())
+            ->method('onTaskException');
+        $worker->addEventListener($listener);
 
         // Execute 1 task
         $worker->work(1);

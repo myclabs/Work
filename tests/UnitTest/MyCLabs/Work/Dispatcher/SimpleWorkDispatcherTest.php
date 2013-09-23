@@ -26,7 +26,7 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertSame('foo', $result);
     }
 
-    public function testEvents()
+    public function testCallbacks()
     {
         $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
 

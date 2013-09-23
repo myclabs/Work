@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../../../../vendor/autoload.php';
 
 
 $queue = $argv[1];
+$timeout = $argv[2];
 
 $connection = new AMQPConnection('localhost', 5672, 'guest', 'guest');
 $channel = $connection->channel();
@@ -19,7 +20,7 @@ $channel = $connection->channel();
 $workDispatcher = new RabbitMQWorkDispatcher($channel, $queue);
 
 // Emit 1 task and wait for 1 second for it to complete
-$workDispatcher->runBackground(new FakeTask(), 1);
+$workDispatcher->runBackground(new FakeTask(), $timeout);
 
 $channel->close();
 $connection->close();

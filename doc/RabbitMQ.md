@@ -71,7 +71,7 @@ public function onTaskSuccess(Task $task, $dispatcherNotified)
 {
     if (!$dispatcherNotified) {
         // The user is notified only if he didn't see "The operation has completed." (see above)
-        $this->notifyUserTaskFinished("The operation has now completed.");
+        sendEmailToUser("The operation has now completed.");
     }
 }
 ```

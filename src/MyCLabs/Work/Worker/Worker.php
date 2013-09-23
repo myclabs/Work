@@ -24,6 +24,11 @@ abstract class Worker
     const EVENT_BEFORE_TASK_EXECUTION = 'beforeTaskExecution';
 
     /**
+     * Event: after a task is executed (without error).
+     */
+    const EVENT_BEFORE_TASK_FINISHED = 'beforeTaskFinished';
+
+    /**
      * Event: when a task is executed successfully.
      */
     const EVENT_ON_TASK_SUCCESS = 'onTaskSuccess';

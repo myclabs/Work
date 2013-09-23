@@ -86,7 +86,7 @@ class RabbitMQWorker extends Worker
             // Execute the task
             $this->getExecutor($task)->execute($task);
 
-            $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task]);
+            $this->triggerEvent(self::EVENT_BEFORE_TASK_FINISHED, [$task]);
         } catch (Exception $e) {
             $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [$task, $e]);
 
@@ -101,8 +101,12 @@ class RabbitMQWorker extends Worker
 
         // If the emitter wants a reply, we reply
         if ($replyExchange) {
-            $this->signalSuccess($replyExchange, $replyQueue);
+            $dispatcherNotified = $this->signalSuccess($replyExchange, $replyQueue);
+        } else {
+            $dispatcherNotified = false;
         }
+
+        $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task, $dispatcherNotified]);
     }
 
     /**
@@ -110,9 +114,13 @@ class RabbitMQWorker extends Worker
      *
      * @param string $exchange
      * @param string $queue
+     *
+     * @return bool
      */
     private function signalSuccess($exchange, $queue)
     {
+        $dispatcherNotified = false;
+
         // We put in the queue that we finished
         $this->channel->basic_publish(new AMQPMessage('finished'), $exchange);
 
@@ -121,22 +129,26 @@ class RabbitMQWorker extends Worker
 
         if (! $message) {
             // Shouldn't happen -> error while delivering messages?
-            return;
+            return false;
         }
 
         // If the first message of the queue is a "timeout" message from the emitter
         if ($message->body == 'timeout') {
             // Delete the temporary exchange
             $this->channel->exchange_delete($exchange);
+            $dispatcherNotified = false;
         }
 
         // If the first message of the queue is our "finished" message, we can die in peace
         if ($message->body == 'finished') {
             // Do not delete the temp exchange: still used by the app
+            $dispatcherNotified = true;
         }
 
         // Delete the temporary queue
         $this->channel->queue_delete($queue);
+
+        return $dispatcherNotified;
     }
 
     /**

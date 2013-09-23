@@ -51,6 +51,8 @@ class WorkerTest extends PHPUnit_Framework_TestCase
         $listener->expects($this->once())
             ->method('beforeTaskExecution');
         $listener->expects($this->once())
+            ->method('beforeTaskFinished');
+        $listener->expects($this->once())
             ->method('onTaskSuccess');
         $listener->expects($this->once())
             ->method('onTaskException');
@@ -68,8 +70,9 @@ class FakeWorker extends Worker
     {
         $this->triggerEvent(self::EVENT_AFTER_TASK_UNSERIALIZATION, [new FakeTask()]);
         $this->triggerEvent(self::EVENT_BEFORE_TASK_EXECUTION, [new FakeTask()]);
-        $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [new FakeTask()]);
+        $this->triggerEvent(self::EVENT_BEFORE_TASK_FINISHED, [new FakeTask()]);
         $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [new FakeTask(), new \Exception()]);
+        $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [new FakeTask(), true]);
     }
 }
 

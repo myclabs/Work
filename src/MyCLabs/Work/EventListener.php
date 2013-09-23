@@ -17,6 +17,8 @@ abstract class EventListener
      *
      * You can use this event to prepare the task to be sent.
      *
+     * @codeCoverageIgnore
+     *
      * @param Task $task
      */
     public function beforeTaskDispatched(Task $task)
@@ -27,6 +29,8 @@ abstract class EventListener
      * Event called before a task is serialized.
      *
      * You can use this event to prepare data in the task to be serialized.
+     *
+     * @codeCoverageIgnore
      *
      * @param Task $task
      */
@@ -39,6 +43,8 @@ abstract class EventListener
      *
      * You can use this event to restore the state of the task.
      *
+     * @codeCoverageIgnore
+     *
      * @param Task $task
      */
     public function afterTaskUnserialization(Task $task)
@@ -50,6 +56,8 @@ abstract class EventListener
      *
      * If an exception is thrown in this method, then the task will be considered as errored
      * and the onTaskException event will be called.
+     *
+     * @codeCoverageIgnore
      *
      * @param Task $task
      */
@@ -65,6 +73,8 @@ abstract class EventListener
      * If an exception is thrown in this method, then the task will be considered as errored
      * and the onTaskException event will be called.
      *
+     * @codeCoverageIgnore
+     *
      * @param Task $task
      */
     public function beforeTaskFinished(Task $task)
@@ -75,6 +85,8 @@ abstract class EventListener
      * Event called after a task is executed successfully. The task has finished at this point.
      *
      * If an exception is thrown in this method, the worker will blow up!
+     *
+     * @codeCoverageIgnore
      *
      * @param Task $task
      * @param bool $dispatcherNotified If true, then the dispatcher of the task was waiting for the task
@@ -89,6 +101,8 @@ abstract class EventListener
      * Event called when a task was executed but threw an exception.
      *
      * If an exception is thrown in this method, the worker will blow up!
+     *
+     * @codeCoverageIgnore
      *
      * @param Task      $task
      * @param Exception $e

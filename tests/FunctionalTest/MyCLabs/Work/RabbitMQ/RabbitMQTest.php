@@ -3,6 +3,7 @@
 namespace FunctionalTest\MyCLabs\Work\RabbitMQ;
 
 use MyCLabs\Work\Dispatcher\RabbitMQWorkDispatcher;
+use MyCLabs\Work\TaskExecutor\TaskExecutor;
 use MyCLabs\Work\Worker\RabbitMQWorker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
@@ -120,16 +121,19 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
-        $mock = $this->getMock('stdClass', ['callback']);
+        // Check that "timeout" is called, but not "completed"
+        $mock = $this->getMock('stdClass', ['completed', 'timeout']);
+        $mock->expects($this->never())
+            ->method('completed');
         $mock->expects($this->once())
-            ->method('callback');
+            ->method('timeout');
 
         // Pile up a task to execute and let it timeout
-        $workDispatcher->runBackground(new FakeTask(), 0.01, null, [$mock, 'callback']);
+        $workDispatcher->runBackground(new FakeTask(), 0.01, [$mock, 'completed'], [$mock, 'timeout']);
     }
 
     /**
-     * Test that if we wait for a task and it times out, the callback is called
+     * Test the Dispatcher with waiting for the job to complete
      */
     public function testRunBackgroundWithWait()
     {
@@ -140,10 +144,38 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $log = __DIR__ . '/worker.log';
         exec("php $file {$this->queue} > $log 2> $log &");
 
-        $mock = $this->getMock('stdClass', ['callback']);
+        // Check that "completed" is called, but not "timeout"
+        $mock = $this->getMock('stdClass', ['completed', 'timeout']);
         $mock->expects($this->once())
-            ->method('callback');
+            ->method('completed');
+        $mock->expects($this->never())
+            ->method('timeout');
 
-        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'callback']);
+        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout']);
+
+        // Check that the log is empty (no error)
+        $this->assertStringEqualsFile($log, '');
+    }
+
+    /**
+     * Test the Worker with waiting for the job to complete
+     */
+    public function testWorkWithWait()
+    {
+        $worker = new RabbitMQWorker($this->channel, $this->queue);
+        /** @var TaskExecutor $taskExecutor */
+        $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
+        $worker->registerTaskExecutor('FunctionalTest\MyCLabs\Work\RabbitMQ\FakeTask', $taskExecutor);
+
+        // Run the task dispatcher as background task (it will emit 1 task and wait for it)
+        $file = __DIR__ . '/dispatch-task.php';
+        $log = __DIR__ . '/dispatch-task.log';
+        exec("php $file {$this->queue} > $log 2> $log &");
+
+        // Execute 1 task
+        $worker->work(1);
+
+        // Check that the log is empty (no error)
+        $this->assertStringEqualsFile($log, '');
     }
 }

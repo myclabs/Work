@@ -20,13 +20,10 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
 
         $dispatcher = new SimpleWorkDispatcher($worker);
 
-        $result = $dispatcher->runBackground($task);
-
-        // Check that the result is returned
-        $this->assertSame('foo', $result);
+        $dispatcher->runBackground($task);
     }
 
-    public function testCallbacks()
+    public function testCallbackSuccess()
     {
         $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
 
@@ -38,12 +35,37 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
         $dispatcher = new SimpleWorkDispatcher($worker);
 
         // Check that "completed" is called, but not "timeout"
-        $mock = $this->getMock('stdClass', ['completed', 'timeout']);
+        $mock = $this->getMock('stdClass', ['completed', 'timeout', 'errored']);
         $mock->expects($this->once())
             ->method('completed');
         $mock->expects($this->never())
             ->method('timeout');
+        $mock->expects($this->never())
+            ->method('errored');
 
-        $dispatcher->runBackground($task, 1, [$mock, 'completed'], [$mock, 'timeout']);
+        $dispatcher->runBackground($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+    }
+
+    public function testCallbackError()
+    {
+        $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
+
+        $worker = $this->getMock('MyCLabs\Work\Worker\SimpleWorker');
+        $worker->expects($this->once())
+            ->method('executeTask')
+            ->will($this->throwException(new \Exception('foo')));
+
+        $dispatcher = new SimpleWorkDispatcher($worker);
+
+        // Check that "errored" is called
+        $mock = $this->getMock('stdClass', ['completed', 'timeout', 'errored']);
+        $mock->expects($this->never())
+            ->method('completed');
+        $mock->expects($this->never())
+            ->method('timeout');
+        $mock->expects($this->once())
+            ->method('errored');
+
+        $dispatcher->runBackground($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
     }
 }

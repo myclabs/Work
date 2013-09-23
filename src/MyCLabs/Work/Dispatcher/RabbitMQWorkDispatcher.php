@@ -40,7 +40,8 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
         Task $task,
         $wait = 0,
         callable $completed = null,
-        callable $timedout = null
+        callable $timedout = null,
+        callable $errored = null
     ) {
         $waitForResult = ($wait > 0);
 
@@ -70,12 +71,18 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
         $this->channel->basic_publish($message, '', $this->queue);
 
         if ($waitForResult) {
-            $this->waitForTask($wait, $replyExchange, $replyQueue, $completed, $timedout);
+            $this->waitForTask($wait, $replyExchange, $replyQueue, $completed, $timedout, $errored);
         }
     }
 
-    private function waitForTask($timeout, $exchange, $queue, callable $completed = null, callable $timedout = null)
-    {
+    private function waitForTask(
+        $timeout,
+        $exchange,
+        $queue,
+        callable $completed = null,
+        callable $timedout = null,
+        callable $errored = null
+    ) {
         // Wait X seconds for the task to be finished
         $message = $this->waitForMessage($queue, $timeout);
 
@@ -97,6 +104,15 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
         if ($message->body == 'finished') {
             if ($completed !== null) {
                 call_user_func($completed);
+            }
+            // Delete the temporary exchange
+            $this->channel->exchange_delete($exchange);
+        }
+
+        // If the first message of the queue is a "errored" message from the worker
+        if ($message->body == 'errored') {
+            if ($errored !== null) {
+                call_user_func($errored);
             }
             // Delete the temporary exchange
             $this->channel->exchange_delete($exchange);

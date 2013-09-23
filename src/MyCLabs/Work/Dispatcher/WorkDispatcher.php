@@ -37,15 +37,17 @@ abstract class WorkDispatcher
      * @param Task     $task
      * @param int      $wait      Number of seconds to wait for the task to complete. If 0, doesn't wait.
      * @param callable $completed Called (if $wait > 0) when the task has completed.
-     * @param callable $timedout  Called if we hit the timeout while waiting.
-     * @todo handler for error
+     * @param callable $timedout  Called (if $wait > 0) if we hit the timeout while waiting.
+     * @param callable $errored   Called (if $wait > 0) if the task errors.
+     *
      * @return void No results
      */
     public abstract function runBackground(
         Task $task,
         $wait = 0,
         callable $completed = null,
-        callable $timedout = null
+        callable $timedout = null,
+        callable $errored = null
     );
 
     /**

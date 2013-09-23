@@ -42,13 +42,13 @@ class SimpleWorker extends Worker
             $this->triggerEvent(self::EVENT_BEFORE_TASK_FINISHED, [$task]);
         } catch (Exception $e) {
             // Event: error
-            $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [$task, $e]);
+            $this->triggerEvent(self::EVENT_ON_TASK_ERROR, [$task, $e, true]);
 
             // Rethrow the exception
             throw $e;
         }
 
-        $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task, false]);
+        $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task, true]);
 
         return $result;
     }

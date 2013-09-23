@@ -36,7 +36,7 @@ abstract class Worker
     /**
      * Event: when a task was executed but threw an exception.
      */
-    const EVENT_ON_TASK_EXCEPTION = 'onTaskException';
+    const EVENT_ON_TASK_ERROR = 'onTaskError';
 
     /**
      * Executors indexed by task name.

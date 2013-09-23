@@ -106,8 +106,11 @@ abstract class EventListener
      *
      * @param Task      $task
      * @param Exception $e
+     * @param bool $dispatcherNotified If true, then the dispatcher of the task was waiting for the task
+     *                                 to execute and was notified that there was an error. If false, either
+     *                                 the dispatcher wasn't waiting, either it stopped waiting after some time.
      */
-    public function onTaskException(Task $task, Exception $e)
+    public function onTaskError(Task $task, Exception $e, $dispatcherNotified)
     {
     }
 }

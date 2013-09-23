@@ -80,33 +80,38 @@ class RabbitMQWorker extends Worker
 
         try {
             $this->triggerEvent(self::EVENT_AFTER_TASK_UNSERIALIZATION, [$task]);
-
             $this->triggerEvent(self::EVENT_BEFORE_TASK_EXECUTION, [$task]);
 
             // Execute the task
             $this->getExecutor($task)->execute($task);
 
             $this->triggerEvent(self::EVENT_BEFORE_TASK_FINISHED, [$task]);
+
+            $success = true;
+            $e = null;
         } catch (Exception $e) {
-            $this->triggerEvent(self::EVENT_ON_TASK_EXCEPTION, [$task, $e]);
-
-            // Signal the task execution has failed
-            $channel->basic_reject($message->delivery_info['delivery_tag'], false);
-
-            return;
+            $success = false;
         }
 
-        // Send ACK signaling the task execution is over
-        $channel->basic_ack($message->delivery_info['delivery_tag']);
-
-        // If the emitter wants a reply, we reply
-        if ($replyExchange) {
-            $dispatcherNotified = $this->signalSuccess($replyExchange, $replyQueue);
+        // Signal the job status to RabbitMQ
+        if ($success) {
+            $channel->basic_ack($message->delivery_info['delivery_tag']);
         } else {
-            $dispatcherNotified = false;
+            $channel->basic_reject($message->delivery_info['delivery_tag'], false);
         }
 
-        $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task, $dispatcherNotified]);
+        $dispatcherNotified = false;
+        // Signal the job status to the dispatcher
+        if ($replyExchange) {
+            $message = ($success ? 'finished' : 'errored');
+            $dispatcherNotified = $this->notifyDispatcher($replyExchange, $replyQueue, $message);
+        }
+
+        if ($success) {
+            $this->triggerEvent(self::EVENT_ON_TASK_SUCCESS, [$task, $dispatcherNotified]);
+        } else {
+            $this->triggerEvent(self::EVENT_ON_TASK_ERROR, [$task, $e, $dispatcherNotified]);
+        }
     }
 
     /**
@@ -114,15 +119,16 @@ class RabbitMQWorker extends Worker
      *
      * @param string $exchange
      * @param string $queue
+     * @param string $messageContent Message to send to the dispatcher.
      *
      * @return bool
      */
-    private function signalSuccess($exchange, $queue)
+    private function notifyDispatcher($exchange, $queue, $messageContent)
     {
         $dispatcherNotified = false;
 
         // We put in the queue that we finished
-        $this->channel->basic_publish(new AMQPMessage('finished'), $exchange);
+        $this->channel->basic_publish(new AMQPMessage($messageContent), $exchange);
 
         // Read the first message coming out of the queue
         $message = $this->waitForMessage($queue, 0.5);
@@ -139,8 +145,8 @@ class RabbitMQWorker extends Worker
             $dispatcherNotified = false;
         }
 
-        // If the first message of the queue is our "finished" message, we can die in peace
-        if ($message->body == 'finished') {
+        // If the first message of the queue is our message, we can die in peace
+        if ($message->body == $messageContent) {
             // Do not delete the temp exchange: still used by the app
             $dispatcherNotified = true;
         }

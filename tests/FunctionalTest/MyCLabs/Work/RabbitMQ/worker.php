@@ -10,15 +10,20 @@ ini_set('display_errors', true);
 
 require_once __DIR__ . '/../../../../../vendor/autoload.php';
 
+$queue = $argv[1];
+$error = $argv[2];
+
 class FakeTaskExecutor implements TaskExecutor
 {
     public function execute(Task $task)
     {
+        global $error;
+        if ($error) {
+            throw new \Exception('foo');
+        }
     }
 }
 
-
-$queue = $argv[1];
 
 $connection = new AMQPConnection('localhost', 5672, 'guest', 'guest');
 $channel = $connection->channel();

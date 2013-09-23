@@ -30,7 +30,8 @@ class FakeWorkDispatcher extends WorkDispatcher
         Task $task,
         $wait = 0,
         callable $completed = null,
-        callable $timedout = null
+        callable $timedout = null,
+        callable $errored = null
     ) {
         $this->triggerEvent(self::EVENT_BEFORE_TASK_SERIALIZATION, [$task]);
     }

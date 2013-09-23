@@ -99,7 +99,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $listener->expects($this->once())
             ->method('beforeTaskExecution');
         $listener->expects($this->once())
-            ->method('onTaskException');
+            ->method('onTaskError');
         $worker->addEventListener($listener);
 
         // Fake task executor
@@ -121,37 +121,76 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
-        // Check that "timeout" is called, but not "completed"
-        $mock = $this->getMock('stdClass', ['completed', 'timeout']);
+        // Check that "timeout" is called, but not "completed" or "errored"
+        $mock = $this->getMock('stdClass', ['completed', 'timeout', 'errored']);
         $mock->expects($this->never())
             ->method('completed');
         $mock->expects($this->once())
             ->method('timeout');
+        $mock->expects($this->never())
+            ->method('errored');
 
         // Pile up a task to execute and let it timeout
-        $workDispatcher->runBackground(new FakeTask(), 0.01, [$mock, 'completed'], [$mock, 'timeout']);
+        $workDispatcher->runBackground(
+            new FakeTask(),
+            0.01,
+            [$mock, 'completed'],
+            [$mock, 'timeout'],
+            [$mock, 'errored']
+        );
     }
 
     /**
      * Test the Dispatcher with waiting for the job to complete
      */
-    public function testRunBackgroundWithWait()
+    public function testRunBackgroundWait()
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
         // Run the worker as background task
         $file = __DIR__ . '/worker.php';
         $log = __DIR__ . '/worker.log';
-        exec("php $file {$this->queue} > $log 2> $log &");
+        $triggerError = 0;
+        exec("php $file {$this->queue} $triggerError > $log 2> $log &");
 
-        // Check that "completed" is called, but not "timeout"
-        $mock = $this->getMock('stdClass', ['completed', 'timeout']);
+        // Check that "completed" is called, but not "timeout" or "errored"
+        $mock = $this->getMock('stdClass', ['completed', 'timeout', 'errored']);
         $mock->expects($this->once())
             ->method('completed');
         $mock->expects($this->never())
             ->method('timeout');
+        $mock->expects($this->never())
+            ->method('errored');
 
-        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout']);
+        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+
+        // Check that the log is empty (no error)
+        $this->assertStringEqualsFile($log, '');
+    }
+
+    /**
+     * Test the Dispatcher with waiting for the job to complete, and the job errors
+     */
+    public function testRunBackgroundWaitError()
+    {
+        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
+
+        // Run the worker as background task
+        $file = __DIR__ . '/worker.php';
+        $log = __DIR__ . '/worker.log';
+        $triggerError = 1;
+        exec("php $file {$this->queue} $triggerError > $log 2> $log &");
+
+        // Check that "completed" is called, but not "timeout" or "errored"
+        $mock = $this->getMock('stdClass', ['completed', 'timeout', 'errored']);
+        $mock->expects($this->never())
+            ->method('completed');
+        $mock->expects($this->never())
+            ->method('timeout');
+        $mock->expects($this->once())
+            ->method('errored');
+
+        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
 
         // Check that the log is empty (no error)
         $this->assertStringEqualsFile($log, '');

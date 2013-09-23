@@ -60,11 +60,14 @@ $timeout = function() {
     echo "The operation is being applied. You will be notified when it has completed.";
     // to notify the user, see below
 }
+$error = function() {
+    echo "There was an error while completing the operation!";
+}
 
-$workDispatcher->runBackground($task, $wait = 5, $completed, $timeout);
+$workDispatcher->runBackground($task, $wait = 5, $completed, $timeout, $error);
 ```
 
-On the worker side, you can use the event `onTaskSuccess` and the parameter `$dispatcherNotified`:
+On the worker side, you can use the events and the parameter `$dispatcherNotified`:
 
 ```php
 public function onTaskSuccess(Task $task, $dispatcherNotified)
@@ -72,6 +75,13 @@ public function onTaskSuccess(Task $task, $dispatcherNotified)
     if (!$dispatcherNotified) {
         // The user is notified only if he didn't see "The operation has completed." (see above)
         sendEmailToUser("The operation has now completed.");
+    }
+}
+public function onTaskError(Task $task, Exception $e, $dispatcherNotified)
+{
+    if (!$dispatcherNotified) {
+        // The user is notified only if he didn't see "The operation has completed." (see above)
+        sendEmailToUser("There was an error while completing the operation!");
     }
 }
 ```

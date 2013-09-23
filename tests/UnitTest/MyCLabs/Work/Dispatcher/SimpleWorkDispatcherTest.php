@@ -25,4 +25,25 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
         // Check that the result is returned
         $this->assertSame('foo', $result);
     }
+
+    public function testEvents()
+    {
+        $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
+
+        $worker = $this->getMock('MyCLabs\Work\Worker\SimpleWorker');
+        $worker->expects($this->once())
+            ->method('executeTask')
+            ->will($this->returnValue('foo'));
+
+        $dispatcher = new SimpleWorkDispatcher($worker);
+
+        // Check that "completed" is called, but not "timeout"
+        $mock = $this->getMock('stdClass', ['completed', 'timeout']);
+        $mock->expects($this->once())
+            ->method('completed');
+        $mock->expects($this->never())
+            ->method('timeout');
+
+        $dispatcher->runBackground($task, 1, [$mock, 'completed'], [$mock, 'timeout']);
+    }
 }

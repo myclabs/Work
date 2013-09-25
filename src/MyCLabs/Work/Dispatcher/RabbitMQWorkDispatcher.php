@@ -58,12 +58,16 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
         $replyExchange = null;
         $replyQueue = null;
         if ($waitForResult) {
-            // Create a temporary exchange and queue for communicating with the worker
+            // Create a temporary exchange (durable, autodelete) for communicating with the worker
             $replyExchange = uniqid('tmp');
-            $this->channel->exchange_declare($replyExchange, 'fanout');
+            $this->channel->exchange_declare($replyExchange, 'fanout', false, true, true);
+            // Create and bind a queue for the dispatcher (our queue) (exclusive queue)
             list($replyQueue, ,) = $this->channel->queue_declare('', false, false, true);
             $this->channel->queue_bind($replyQueue, $replyExchange);
-            $messageOptions['reply_to'] = $replyExchange;
+            // Create and bind a queue for the worker (durable non-exclusive queue)
+            list($workerReplyQueue, ,) = $this->channel->queue_declare('', false, true, false);
+            $this->channel->queue_bind($workerReplyQueue, $replyExchange);
+            $messageOptions['reply_to'] = $replyExchange . ';' . $workerReplyQueue;
         }
 
         $message = new AMQPMessage(serialize($task), $messageOptions);

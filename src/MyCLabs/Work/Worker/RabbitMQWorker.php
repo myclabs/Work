@@ -5,6 +5,8 @@ namespace MyCLabs\Work\Worker;
 use Exception;
 use MyCLabs\Work\Task\Task;
 use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -66,13 +68,11 @@ class RabbitMQWorker extends Worker
         /** @var AMQPChannel $channel */
         $channel = $message->delivery_info['channel'];
 
-        // Listen to the "reply_to" exchange
+        // Listen to the "reply_to" queue
         $replyExchange = null;
         $replyQueue = null;
         if ($message->has('reply_to')) {
-            $replyExchange = $message->get('reply_to');
-            list($replyQueue, ,) = $this->channel->queue_declare('', false, false, true);
-            $this->channel->queue_bind($replyQueue, $replyExchange);
+            list($replyExchange, $replyQueue) = explode(';', $message->get('reply_to'));
         }
 
         /** @var Task $task */
@@ -125,8 +125,6 @@ class RabbitMQWorker extends Worker
      */
     private function notifyDispatcher($exchange, $queue, $messageContent)
     {
-        $dispatcherNotified = false;
-
         // We put in the queue that we finished
         $this->channel->basic_publish(new AMQPMessage($messageContent), $exchange);
 
@@ -138,20 +136,11 @@ class RabbitMQWorker extends Worker
             return false;
         }
 
-        // If the first message of the queue is a "timeout" message from the emitter
-        if ($message->body == 'timeout') {
-            // Delete the temporary exchange
-            $this->channel->exchange_delete($exchange);
-            $dispatcherNotified = false;
-        }
-
         // If the first message of the queue is our message, we can die in peace
-        if ($message->body == $messageContent) {
-            // Do not delete the temp exchange: still used by the app
-            $dispatcherNotified = true;
-        }
+        // (else it would be the "timeout" message from the dispatcher)
+        $dispatcherNotified = ($message->body == $messageContent);
 
-        // Delete the temporary queue
+        // Delete our queue
         $this->channel->queue_delete($queue);
 
         return $dispatcherNotified;

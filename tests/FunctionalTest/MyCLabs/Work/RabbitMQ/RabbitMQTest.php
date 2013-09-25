@@ -274,10 +274,34 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             ->method('onTaskException');
         $worker->addEventListener($listener);
 
-        // Execute 1 task
         $worker->work(1);
+    }
 
+    /**
+     * Test when the worker start after the dispatcher has emitted 1 task and timeouted.
+     * The problem met was that the exchange didn't exist anymore.
+     */
+    public function testWorkerStartAfterDispatcherTimeout()
+    {
+        $worker = new RabbitMQWorker($this->channel, $this->queue);
+        $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
+        $worker->registerTaskExecutor('FunctionalTest\MyCLabs\Work\RabbitMQ\FakeTask', $taskExecutor);
+
+        // Run the task dispatcher and wait for it to timeout and finish
+        $file = __DIR__ . '/dispatch-task.php';
+        // The worker waits for 1ms
+        $wait = 0.001;
+        $return = exec("php $file {$this->queue} $wait");
         // Check that the log is empty (no error)
-        $this->assertStringEqualsFile($log, '');
+        $this->assertEquals('', $return);
+
+        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener->expects($this->once())
+            ->method('onTaskSuccess')
+            // Check that $dispatcherNotified = false
+            ->with($this->anything(), false);
+        $worker->addEventListener($listener);
+
+        $worker->work(1);
     }
 }

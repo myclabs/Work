@@ -63,5 +63,5 @@ class FakeServiceLocator
  */
 interface Service
 {
-    function bar($param1, $param2, $param3);
+    public function bar($param1, $param2, $param3);
 }

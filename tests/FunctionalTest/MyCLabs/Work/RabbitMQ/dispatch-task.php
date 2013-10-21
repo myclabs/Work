@@ -2,7 +2,6 @@
 
 use FunctionalTest\MyCLabs\Work\RabbitMQ\FakeTask;
 use MyCLabs\Work\Dispatcher\RabbitMQWorkDispatcher;
-use MyCLabs\Work\Worker\RabbitMQWorker;
 use PhpAmqpLib\Connection\AMQPConnection;
 
 ini_set('error_reporting', E_ALL);

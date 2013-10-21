@@ -54,7 +54,7 @@ abstract class Worker
      *
      * @param int $count Number of task to execute. If null, then loop infinitely
      */
-    public abstract function work($count = null);
+    abstract public function work($count = null);
 
     /**
      * Registers an executor that will handle task of a certain type.

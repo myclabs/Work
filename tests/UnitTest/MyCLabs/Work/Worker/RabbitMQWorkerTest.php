@@ -12,7 +12,13 @@ class RabbitMQWorkerTest extends PHPUnit_Framework_TestCase
      */
     public function testLimitNumberOfTask($times)
     {
-        $channel = $this->getMock('PhpAmqpLib\Channel\AMQPChannel', ['basic_qos', 'basic_consume', 'wait'], [], '', false);
+        $channel = $this->getMock(
+            'PhpAmqpLib\Channel\AMQPChannel',
+            ['basic_qos', 'basic_consume', 'wait'],
+            [],
+            '',
+            false
+        );
         $channel->callbacks = 1;
 
         // Check that it will loop only X times

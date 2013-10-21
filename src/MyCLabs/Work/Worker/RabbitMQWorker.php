@@ -5,8 +5,6 @@ namespace MyCLabs\Work\Worker;
 use Exception;
 use MyCLabs\Work\Task\Task;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
-use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
@@ -41,7 +39,7 @@ class RabbitMQWorker extends Worker
      */
     public function work($count = null)
     {
-        $callback = function(AMQPMessage $message) {
+        $callback = function (AMQPMessage $message) {
             $this->taskHandler($message);
         };
 

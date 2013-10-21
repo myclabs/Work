@@ -48,9 +48,13 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $this->channel->queue_delete($this->queue);
-        $this->channel->close();
-        $this->connection->close();
+        if ($this->channel) {
+            $this->channel->queue_delete($this->queue);
+            $this->channel->close();
+        }
+        if ($this->connection) {
+            $this->connection->close();
+        }
     }
 
     public function testSimpleRunBackground()
@@ -245,10 +249,10 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
         $taskExecutor->expects($this->once())
             ->method('execute')
-            ->will($this->returnCallback(function() {
-                        // The task executes in 500ms
-                        usleep(500000);
-                    }));
+            ->will($this->returnCallback(function () {
+                // The task executes in 500ms
+                usleep(500000);
+            }));
         $worker->registerTaskExecutor('FunctionalTest\MyCLabs\Work\RabbitMQ\FakeTask', $taskExecutor);
 
         // Run the task dispatcher as background task (it will emit 1 task and wait for it)

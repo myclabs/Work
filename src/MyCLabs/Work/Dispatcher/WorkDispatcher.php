@@ -42,7 +42,7 @@ abstract class WorkDispatcher
      *
      * @return void No results
      */
-    public abstract function runBackground(
+    abstract public function runBackground(
         Task $task,
         $wait = 0,
         callable $completed = null,

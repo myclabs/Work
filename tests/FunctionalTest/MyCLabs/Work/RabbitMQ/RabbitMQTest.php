@@ -192,7 +192,8 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())
             ->method('timeout');
         $mock->expects($this->once())
-            ->method('errored');
+            ->method('errored')
+            ->with($this->isInstanceOf('Exception'));
 
         $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
 

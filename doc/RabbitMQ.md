@@ -53,14 +53,14 @@ This can be achieve using this library. Here is a schema of how it works interna
 On you client side, you can use `runBackground` like so:
 
 ```php
-$completed = function() {
+$completed = function () {
     echo "The operation has completed.";
 }
-$timeout = function() {
+$timeout = function () {
     echo "The operation is being applied. You will be notified when it has completed.";
     // to notify the user, see below
 }
-$error = function() {
+$error = function (Exception $e) {
     echo "There was an error while completing the operation!";
 }
 

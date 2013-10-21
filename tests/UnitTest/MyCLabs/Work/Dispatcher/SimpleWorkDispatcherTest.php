@@ -64,7 +64,8 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())
             ->method('timeout');
         $mock->expects($this->once())
-            ->method('errored');
+            ->method('errored')
+            ->with($this->isInstanceOf('Exception'));
 
         $dispatcher->runBackground($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
     }

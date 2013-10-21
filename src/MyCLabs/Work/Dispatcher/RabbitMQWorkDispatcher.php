@@ -116,7 +116,8 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
         // If the first message of the queue is a "errored" message from the worker
         if ($message->body == 'errored') {
             if ($errored !== null) {
-                call_user_func($errored);
+                $e = new \RuntimeException("An error occured in the background task");
+                call_user_func($errored, $e);
             }
             // Delete the temporary exchange
             $this->channel->exchange_delete($exchange);

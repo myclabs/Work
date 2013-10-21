@@ -47,7 +47,7 @@ class SimpleWorkDispatcher extends WorkDispatcher
             $this->worker->executeTask($task);
         } catch (\Exception $e) {
             if ($errored) {
-                call_user_func($errored);
+                call_user_func($errored, $e);
             }
             return;
         }

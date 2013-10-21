@@ -38,7 +38,7 @@ abstract class WorkDispatcher
      * @param int      $wait      Number of seconds to wait for the task to complete. If 0, doesn't wait.
      * @param callable $completed Called (if $wait > 0) when the task has completed.
      * @param callable $timedout  Called (if $wait > 0) if we hit the timeout while waiting.
-     * @param callable $errored   Called (if $wait > 0) if the task errors.
+     * @param callable $errored   Called (if $wait > 0) if the task errors. Takes 1 parameter which is the exception.
      *
      * @return void No results
      */

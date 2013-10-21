@@ -70,6 +70,10 @@ class BigComputationExecutor implements MyCLabs\Work\TaskExecutor\TaskExecutor
 }
 ```
 
+## Read more
+
+Read more in [the docs](doc/).
+
 ## Contributing
 
 You can run the tests with PHPUnit:

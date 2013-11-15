@@ -21,6 +21,7 @@ class FakeTaskExecutor implements TaskExecutor
         if ($error) {
             throw new \Exception('foo');
         }
+        echo "ok";
     }
 }
 

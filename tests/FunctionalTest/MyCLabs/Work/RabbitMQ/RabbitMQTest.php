@@ -169,7 +169,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
 
         // Check that the log is empty (no error)
-        $this->assertStringEqualsFile($log, '');
+        $this->assertStringEqualsFile($log, 'ok');
     }
 
     /**
@@ -308,5 +308,27 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $worker->addEventListener($listener);
 
         $worker->work(1);
+    }
+
+    /**
+     * Test a scenario where tasks are piling up in RabbitMQ
+     */
+    public function testTaskQueuing()
+    {
+        $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
+
+        // Queue 2 tasks
+        $workDispatcher->runBackground(new FakeTask(), 0.1);
+        $workDispatcher->runBackground(new FakeTask(), 0.1);
+
+        $file = __DIR__ . '/worker.php';
+
+        // Process first task
+        $status = shell_exec("php $file {$this->queue} 0 2>&1");
+        $this->assertSame("ok", trim($status));
+
+        // Process second task
+        $status = shell_exec("php $file {$this->queue} 0 2>&1");
+        $this->assertSame("ok", trim($status));
     }
 }

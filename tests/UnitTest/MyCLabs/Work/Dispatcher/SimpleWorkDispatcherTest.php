@@ -2,7 +2,7 @@
 
 namespace UnitTest\MyCLabs\Work\Dispatcher;
 
-use MyCLabs\Work\Dispatcher\SimpleWorkDispatcher;
+use MyCLabs\Work\Adapter\InMemory\Dispatcher\InMemoryWorkDispatcher;
 use PHPUnit_Framework_TestCase;
 
 class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
@@ -18,9 +18,9 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
             ->with($task)
             ->will($this->returnValue('foo'));
 
-        $dispatcher = new SimpleWorkDispatcher($worker);
+        $dispatcher = new InMemoryWorkDispatcher($worker);
 
-        $dispatcher->runBackground($task);
+        $dispatcher->run($task);
     }
 
     public function testCallbackSuccess()
@@ -32,7 +32,7 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
             ->method('executeTask')
             ->will($this->returnValue('foo'));
 
-        $dispatcher = new SimpleWorkDispatcher($worker);
+        $dispatcher = new InMemoryWorkDispatcher($worker);
 
         // Check that "completed" is called, but not "timeout"
         $mock = $this->getMock('stdClass', ['completed', 'timeout', 'errored']);
@@ -43,7 +43,7 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())
             ->method('errored');
 
-        $dispatcher->runBackground($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $dispatcher->run($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
     }
 
     public function testCallbackError()
@@ -55,7 +55,7 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
             ->method('executeTask')
             ->will($this->throwException(new \Exception('foo')));
 
-        $dispatcher = new SimpleWorkDispatcher($worker);
+        $dispatcher = new InMemoryWorkDispatcher($worker);
 
         // Check that "errored" is called
         $mock = $this->getMock('stdClass', ['completed', 'timeout', 'errored']);
@@ -67,6 +67,6 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
             ->method('errored')
             ->with($this->isInstanceOf('Exception'));
 
-        $dispatcher->runBackground($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $dispatcher->run($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
     }
 }

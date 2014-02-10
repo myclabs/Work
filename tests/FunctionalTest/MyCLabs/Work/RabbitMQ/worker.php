@@ -2,7 +2,7 @@
 
 use MyCLabs\Work\Task\Task;
 use MyCLabs\Work\TaskExecutor\TaskExecutor;
-use MyCLabs\Work\Worker\RabbitMQWorker;
+use MyCLabs\Work\Adapter\RabbitMQ\Worker\RabbitMQWorker;
 use PhpAmqpLib\Connection\AMQPConnection;
 
 ini_set('error_reporting', E_ALL);

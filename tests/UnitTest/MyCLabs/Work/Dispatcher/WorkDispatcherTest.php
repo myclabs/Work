@@ -20,13 +20,13 @@ class WorkDispatcherTest extends PHPUnit_Framework_TestCase
         $worker = new FakeWorkDispatcher();
 
         $worker->addEventListener($listener);
-        $worker->runBackground($task);
+        $worker->run($task);
     }
 }
 
 class FakeWorkDispatcher extends WorkDispatcher
 {
-    public function runBackground(
+    public function run(
         Task $task,
         $wait = 0,
         callable $completed = null,

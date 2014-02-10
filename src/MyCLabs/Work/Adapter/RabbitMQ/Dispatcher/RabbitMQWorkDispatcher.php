@@ -1,7 +1,10 @@
 <?php
 
-namespace MyCLabs\Work\Dispatcher;
+namespace MyCLabs\Work\Adapter\RabbitMQ\Dispatcher;
 
+use MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher;
+use MyCLabs\Work\Dispatcher\WorkDispatcher;
+use MyCLabs\Work\Dispatcher\WorkDispatcherEventTrait;
 use MyCLabs\Work\Task\Task;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -11,8 +14,10 @@ use PhpAmqpLib\Message\AMQPMessage;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class RabbitMQWorkDispatcher extends WorkDispatcher
+class RabbitMQWorkDispatcher implements WorkDispatcher, SynchronousWorkDispatcher
 {
+    use WorkDispatcherEventTrait;
+
     /**
      * @var AMQPChannel
      */
@@ -36,7 +41,28 @@ class RabbitMQWorkDispatcher extends WorkDispatcher
     /**
      * {@inheritdoc}
      */
-    public function runBackground(
+    public function run(Task $task)
+    {
+        // Event: before dispatching the task
+        $this->triggerEvent(self::EVENT_BEFORE_TASK_DISPATCHED, [$task]);
+
+        // Event: before serialization
+        $this->triggerEvent(self::EVENT_BEFORE_TASK_SERIALIZATION, [$task]);
+
+        $messageOptions = [
+            'delivery_mode' => 2, // make message persistent
+        ];
+
+        $message = new AMQPMessage(serialize($task), $messageOptions);
+
+        $this->channel->basic_publish($message, '', $this->queue);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function runAndWait(
         Task $task,
         $wait = 0,
         callable $completed = null,

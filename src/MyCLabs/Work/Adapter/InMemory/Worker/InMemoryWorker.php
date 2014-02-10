@@ -1,9 +1,10 @@
 <?php
 
-namespace MyCLabs\Work\Worker;
+namespace MyCLabs\Work\Adapter\InMemory\Worker;
 
 use Exception;
 use MyCLabs\Work\Task\Task;
+use MyCLabs\Work\Worker\Worker;
 
 /**
  * Simple implementation not using any work queue: tasks are executed right away in the same process.
@@ -12,7 +13,7 @@ use MyCLabs\Work\Task\Task;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class SimpleWorker extends Worker
+class InMemoryWorker extends Worker
 {
     /**
      * {@inheritdoc}

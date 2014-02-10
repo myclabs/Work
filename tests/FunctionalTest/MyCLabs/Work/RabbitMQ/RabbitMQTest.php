@@ -2,9 +2,9 @@
 
 namespace FunctionalTest\MyCLabs\Work\RabbitMQ;
 
-use MyCLabs\Work\Dispatcher\RabbitMQWorkDispatcher;
+use MyCLabs\Work\Adapter\RabbitMQ\Dispatcher\RabbitMQWorkDispatcher;
 use MyCLabs\Work\TaskExecutor\TaskExecutor;
-use MyCLabs\Work\Worker\RabbitMQWorker;
+use MyCLabs\Work\Adapter\RabbitMQ\Worker\RabbitMQWorker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
@@ -63,7 +63,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
 
         // Pile up a task to execute
         $task = new FakeTask();
-        $workDispatcher->runBackground($task);
+        $workDispatcher->run($task);
 
         // Run the worker to execute the task
         $worker = new RabbitMQWorker($this->channel, $this->queue);
@@ -93,7 +93,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
 
         // Pile up a task to execute
         $task = new FakeTask();
-        $workDispatcher->runBackground($task);
+        $workDispatcher->run($task);
 
         // Run the worker to execute the task
         $worker = new RabbitMQWorker($this->channel, $this->queue);
@@ -135,7 +135,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             ->method('errored');
 
         // Pile up a task to execute and let it timeout
-        $workDispatcher->runBackground(
+        $workDispatcher->run(
             new FakeTask(),
             0.01,
             [$mock, 'completed'],
@@ -166,7 +166,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())
             ->method('errored');
 
-        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $workDispatcher->run(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
 
         // Check that the log is empty (no error)
         $this->assertStringEqualsFile($log, 'ok');
@@ -195,7 +195,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             ->method('errored')
             ->with($this->isInstanceOf('Exception'));
 
-        $workDispatcher->runBackground(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $workDispatcher->run(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
 
         // Check that the log is empty (no error)
         $this->assertStringEqualsFile($log, '');
@@ -318,8 +318,8 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
         // Queue 2 tasks
-        $workDispatcher->runBackground(new FakeTask(), 0.1);
-        $workDispatcher->runBackground(new FakeTask(), 0.1);
+        $workDispatcher->run(new FakeTask(), 0.1);
+        $workDispatcher->run(new FakeTask(), 0.1);
 
         $file = __DIR__ . '/worker.php';
 

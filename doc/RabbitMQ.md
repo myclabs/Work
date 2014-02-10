@@ -15,7 +15,7 @@ $workDispatcher = new RabbitMQWorkDispatcher($channel, 'some_queue');
 
 // Run a task in background
 $task = new MyTask();
-$workDispatcher->runBackground($task);
+$workDispatcher->run($task);
 ```
 
 On the worker side (this script is meant to be run continuously as a deamon):
@@ -50,7 +50,7 @@ This can be achieve using this library. Here is a schema of how it works interna
 
 ![Diagram](RabbitMQ-diagram.jpg)
 
-On you client side, you can use `runBackground` like so:
+On you client side, you can use `run` like so:
 
 ```php
 $completed = function () {
@@ -64,7 +64,7 @@ $error = function (Exception $e) {
     echo "There was an error while completing the operation!";
 }
 
-$workDispatcher->runBackground($task, $wait = 5, $completed, $timeout, $error);
+$workDispatcher->run($task, $wait = 5, $completed, $timeout, $error);
 ```
 
 On the worker side, you can use the events and the parameter `$dispatcherNotified`:

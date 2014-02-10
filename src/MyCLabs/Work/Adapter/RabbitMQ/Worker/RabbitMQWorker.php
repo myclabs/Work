@@ -1,9 +1,10 @@
 <?php
 
-namespace MyCLabs\Work\Worker;
+namespace MyCLabs\Work\Adapter\RabbitMQ\Worker;
 
 use Exception;
 use MyCLabs\Work\Task\Task;
+use MyCLabs\Work\Worker\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 

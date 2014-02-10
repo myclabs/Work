@@ -2,7 +2,7 @@
 
 namespace UnitTest\MyCLabs\Work\Worker;
 
-use MyCLabs\Work\Worker\SimpleWorker;
+use MyCLabs\Work\Adapter\InMemory\Worker\InMemoryWorker;
 use PHPUnit_Framework_TestCase;
 
 class SimpleWorkerTest extends PHPUnit_Framework_TestCase
@@ -18,7 +18,7 @@ class SimpleWorkerTest extends PHPUnit_Framework_TestCase
             ->with($task)
             ->will($this->returnValue('foo'));
 
-        $worker = new SimpleWorker();
+        $worker = new InMemoryWorker();
         $worker->registerTaskExecutor(get_class($task), $executor);
 
         $result = $worker->executeTask($task);

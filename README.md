@@ -25,7 +25,7 @@ In you code (HTTP request for example), you can run a task in background:
 
 ```php
 $workDispatcher = new RabbitMQWorkDispatcher(/* parameters */);
-$workDispatcher->runBackground(new MyTask());
+$workDispatcher->run(new MyTask());
 ```
 
 Separately, you set up a worker to run continuously on the command line (like a deamon):

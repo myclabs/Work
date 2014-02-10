@@ -13,7 +13,7 @@ class ServiceCallExecutorTest extends PHPUnit_Framework_TestCase
         // Call method "bar" with 3 parameters
         $task = new ServiceCall('foo', 'bar', [1, 2, 3]);
 
-        $service = $this->getMockForAbstractClass('UnitTest\MyCLabs\Work\TaskExecutor\Service');
+        $service = $this->getMockForAbstractClass('Test\MyCLabs\Work\UnitTest\TaskExecutor\Service');
         // Check that the service's method is called with the parameters
         $service->expects($this->once())
             ->method('bar')

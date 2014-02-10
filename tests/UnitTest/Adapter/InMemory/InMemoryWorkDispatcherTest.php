@@ -1,33 +1,32 @@
 <?php
 
-namespace Test\MyCLabs\Work\UnitTest\Dispatcher;
+namespace Test\MyCLabs\Work\UnitTest\Adapter\InMemory;
 
 use MyCLabs\Work\Adapter\InMemory\InMemoryWorkDispatcher;
 use PHPUnit_Framework_TestCase;
 
-class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
+class InMemoryWorkDispatcherTest extends PHPUnit_Framework_TestCase
 {
-    public function testRunBackground()
+    public function testRun()
     {
         $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
 
-        $worker = $this->getMock('MyCLabs\Work\Worker\SimpleWorker');
+        $worker = $this->getMock('MyCLabs\Work\Adapter\InMemory\InMemoryWorker');
         // Check that the worker is called with the task as parameter
         $worker->expects($this->once())
             ->method('executeTask')
-            ->with($task)
-            ->will($this->returnValue('foo'));
+            ->with($task);
 
         $dispatcher = new InMemoryWorkDispatcher($worker);
 
         $dispatcher->run($task);
     }
 
-    public function testCallbackSuccess()
+    public function testRunAndWaitCallbackSuccess()
     {
         $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
 
-        $worker = $this->getMock('MyCLabs\Work\Worker\SimpleWorker');
+        $worker = $this->getMock('MyCLabs\Work\Adapter\InMemory\InMemoryWorker');
         $worker->expects($this->once())
             ->method('executeTask')
             ->will($this->returnValue('foo'));
@@ -43,14 +42,14 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())
             ->method('errored');
 
-        $dispatcher->run($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $dispatcher->runAndWait($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
     }
 
-    public function testCallbackError()
+    public function testRunAndWaitCallbackError()
     {
         $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
 
-        $worker = $this->getMock('MyCLabs\Work\Worker\SimpleWorker');
+        $worker = $this->getMock('MyCLabs\Work\Adapter\InMemory\InMemoryWorker');
         $worker->expects($this->once())
             ->method('executeTask')
             ->will($this->throwException(new \Exception('foo')));
@@ -67,6 +66,6 @@ class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase
             ->method('errored')
             ->with($this->isInstanceOf('Exception'));
 
-        $dispatcher->run($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $dispatcher->runAndWait($task, 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
     }
 }

@@ -7,7 +7,7 @@ use PHPUnit_Framework_TestCase;
 
 class WorkDispatcherEventTraitTest extends PHPUnit_Framework_TestCase
 {
-    public function testEventListener()
+    public function testTriggerEvent()
     {
         $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
         $listener = $this->getMockForAbstractClass('MyCLabs\Work\Dispatcher\Event\DispatcherEventListener');
@@ -20,6 +20,18 @@ class WorkDispatcherEventTraitTest extends PHPUnit_Framework_TestCase
         $worker = new FakeWorkDispatcher();
 
         $worker->registerEventListener($listener);
+        $worker->trigger('beforeTaskSerialization', [$task]);
+    }
+
+    /**
+     * Check that there are no errors
+     */
+    public function testTriggerEventWithNoListener()
+    {
+        $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
+
+        $worker = new FakeWorkDispatcher();
+
         $worker->trigger('beforeTaskSerialization', [$task]);
     }
 }

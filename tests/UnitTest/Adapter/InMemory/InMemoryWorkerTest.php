@@ -1,11 +1,11 @@
 <?php
 
-namespace Test\MyCLabs\Work\UnitTest\Worker;
+namespace Test\MyCLabs\Work\UnitTest\Adapter\InMemory;
 
 use MyCLabs\Work\Adapter\InMemory\InMemoryWorker;
 use PHPUnit_Framework_TestCase;
 
-class SimpleWorkerTest extends PHPUnit_Framework_TestCase
+class InMemoryWorkerTest extends PHPUnit_Framework_TestCase
 {
     public function testExecuteTask()
     {

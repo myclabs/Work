@@ -6,7 +6,6 @@ use MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher;
 use MyCLabs\Work\Dispatcher\WorkDispatcher;
 use MyCLabs\Work\Dispatcher\WorkDispatcherEventTrait;
 use MyCLabs\Work\Task\Task;
-use MyCLabs\Work\Adapter\InMemory\InMemoryWorker;
 
 /**
  * Simple implementation not using any work queue: tasks are executed right away in the same process.
@@ -20,7 +19,7 @@ class InMemoryWorkDispatcher implements WorkDispatcher, SynchronousWorkDispatche
     use WorkDispatcherEventTrait;
 
     /**
-     * @var \MyCLabs\Work\Adapter\InMemory\InMemoryWorker
+     * @var InMemoryWorker
      */
     private $worker;
 

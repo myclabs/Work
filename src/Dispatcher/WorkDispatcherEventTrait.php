@@ -14,7 +14,7 @@ trait WorkDispatcherEventTrait
     /**
      * @var DispatcherEventListener[]
      */
-    protected $listeners;
+    protected $listeners = [];
 
     /**
      * @param DispatcherEventListener $listener

@@ -57,7 +57,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function testSimpleRunBackground()
+    public function testSimpleRun()
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
@@ -87,7 +87,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $worker->work(1);
     }
 
-    public function testRunBackgroundWithException()
+    public function testRunWithException()
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
@@ -121,7 +121,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
     /**
      * Test that if we wait for a task and it times out, the callback is called
      */
-    public function testRunBackgroundWithTimeout()
+    public function testRunAndWaitWithTimeout()
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
@@ -135,7 +135,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             ->method('errored');
 
         // Pile up a task to execute and let it timeout
-        $workDispatcher->run(
+        $workDispatcher->runAndWait(
             new FakeTask(),
             0.01,
             [$mock, 'completed'],
@@ -147,7 +147,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
     /**
      * Test the Dispatcher with waiting for the job to complete
      */
-    public function testRunBackgroundWait()
+    public function testRunAndWaitCompleted()
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
@@ -166,7 +166,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->never())
             ->method('errored');
 
-        $workDispatcher->run(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $workDispatcher->runAndWait(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
 
         // Check that the log is empty (no error)
         $this->assertStringEqualsFile($log, 'ok');
@@ -175,7 +175,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
     /**
      * Test the Dispatcher with waiting for the job to complete, and the job errors
      */
-    public function testRunBackgroundWaitError()
+    public function testRunAndWaitError()
     {
         $workDispatcher = new RabbitMQWorkDispatcher($this->channel, $this->queue);
 
@@ -195,7 +195,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             ->method('errored')
             ->with($this->isInstanceOf('Exception'));
 
-        $workDispatcher->run(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
+        $workDispatcher->runAndWait(new FakeTask(), 1, [$mock, 'completed'], [$mock, 'timeout'], [$mock, 'errored']);
 
         // Check that the log is empty (no error)
         $this->assertStringEqualsFile($log, '');

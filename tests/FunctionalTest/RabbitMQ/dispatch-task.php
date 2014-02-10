@@ -19,7 +19,7 @@ $channel = $connection->channel();
 $workDispatcher = new RabbitMQWorkDispatcher($channel, $queue);
 
 // Emit 1 task and wait for 1 second for it to complete
-$workDispatcher->run(new FakeTask(), $timeout);
+$workDispatcher->runAndWait(new FakeTask(), $timeout);
 
 $channel->close();
 $connection->close();

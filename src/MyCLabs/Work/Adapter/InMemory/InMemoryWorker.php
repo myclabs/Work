@@ -1,6 +1,6 @@
 <?php
 
-namespace MyCLabs\Work\Adapter\InMemory\Worker;
+namespace MyCLabs\Work\Adapter\InMemory;
 
 use Exception;
 use MyCLabs\Work\Task\Task;

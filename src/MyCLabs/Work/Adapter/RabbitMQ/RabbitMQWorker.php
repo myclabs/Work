@@ -1,6 +1,6 @@
 <?php
 
-namespace MyCLabs\Work\Adapter\RabbitMQ\Worker;
+namespace MyCLabs\Work\Adapter\RabbitMQ;
 
 use Exception;
 use MyCLabs\Work\Task\Task;

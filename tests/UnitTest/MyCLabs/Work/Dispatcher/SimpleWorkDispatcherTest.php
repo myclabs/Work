@@ -2,7 +2,7 @@
 
 namespace UnitTest\MyCLabs\Work\Dispatcher;
 
-use MyCLabs\Work\Adapter\InMemory\Dispatcher\InMemoryWorkDispatcher;
+use MyCLabs\Work\Adapter\InMemory\InMemoryWorkDispatcher;
 use PHPUnit_Framework_TestCase;
 
 class SimpleWorkDispatcherTest extends PHPUnit_Framework_TestCase

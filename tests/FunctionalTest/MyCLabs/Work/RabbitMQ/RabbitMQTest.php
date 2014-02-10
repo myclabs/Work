@@ -2,9 +2,9 @@
 
 namespace FunctionalTest\MyCLabs\Work\RabbitMQ;
 
-use MyCLabs\Work\Adapter\RabbitMQ\Dispatcher\RabbitMQWorkDispatcher;
+use MyCLabs\Work\Adapter\RabbitMQ\RabbitMQWorkDispatcher;
 use MyCLabs\Work\TaskExecutor\TaskExecutor;
-use MyCLabs\Work\Adapter\RabbitMQ\Worker\RabbitMQWorker;
+use MyCLabs\Work\Adapter\RabbitMQ\RabbitMQWorker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Exception\AMQPRuntimeException;

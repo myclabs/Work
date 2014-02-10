@@ -1,6 +1,6 @@
 <?php
 
-namespace MyCLabs\Work\Adapter\RabbitMQ\Dispatcher;
+namespace MyCLabs\Work\Adapter\RabbitMQ;
 
 use MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher;
 use MyCLabs\Work\Dispatcher\WorkDispatcher;

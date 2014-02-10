@@ -2,7 +2,7 @@
 
 namespace UnitTest\MyCLabs\Work\Worker;
 
-use MyCLabs\Work\Adapter\RabbitMQ\Worker\RabbitMQWorker;
+use MyCLabs\Work\Adapter\RabbitMQ\RabbitMQWorker;
 use PHPUnit_Framework_TestCase;
 
 class RabbitMQWorkerTest extends PHPUnit_Framework_TestCase

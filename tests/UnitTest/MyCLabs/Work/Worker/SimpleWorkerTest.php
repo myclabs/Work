@@ -2,7 +2,7 @@
 
 namespace UnitTest\MyCLabs\Work\Worker;
 
-use MyCLabs\Work\Adapter\InMemory\Worker\InMemoryWorker;
+use MyCLabs\Work\Adapter\InMemory\InMemoryWorker;
 use PHPUnit_Framework_TestCase;
 
 class SimpleWorkerTest extends PHPUnit_Framework_TestCase

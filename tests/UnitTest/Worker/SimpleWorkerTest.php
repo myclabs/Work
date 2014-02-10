@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Worker;
+namespace Test\MyCLabs\Work\UnitTest\Worker;
 
 use MyCLabs\Work\Adapter\InMemory\InMemoryWorker;
 use PHPUnit_Framework_TestCase;

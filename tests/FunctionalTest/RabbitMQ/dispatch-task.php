@@ -1,13 +1,13 @@
 <?php
 
-use FunctionalTest\MyCLabs\Work\RabbitMQ\FakeTask;
 use MyCLabs\Work\Adapter\RabbitMQ\RabbitMQWorkDispatcher;
 use PhpAmqpLib\Connection\AMQPConnection;
+use Test\MyCLabs\Work\FunctionalTest\RabbitMQ\FakeTask;
 
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', true);
 
-require_once __DIR__ . '/../../../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 
 $queue = $argv[1];

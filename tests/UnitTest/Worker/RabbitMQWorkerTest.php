@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Worker;
+namespace Test\MyCLabs\Work\UnitTest\Worker;
 
 use MyCLabs\Work\Adapter\RabbitMQ\RabbitMQWorker;
 use PHPUnit_Framework_TestCase;

@@ -1,25 +1,26 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Dispatcher;
+namespace Test\MyCLabs\Work\UnitTest\Dispatcher;
 
 use MyCLabs\Work\Dispatcher\WorkDispatcherEventTrait;
 use PHPUnit_Framework_TestCase;
 
-class WorkDispatcherTest extends PHPUnit_Framework_TestCase
+class WorkDispatcherEventTraitTest extends PHPUnit_Framework_TestCase
 {
     public function testEventListener()
     {
-        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
+        $listener = $this->getMockForAbstractClass('MyCLabs\Work\Dispatcher\Event\DispatcherEventListener');
 
         // Check that event methods are called
         $listener->expects($this->once())
             ->method('beforeTaskSerialization')
-            ->with('foo', 'bar');
+            ->with($task);
 
         $worker = new FakeWorkDispatcher();
 
         $worker->registerEventListener($listener);
-        $worker->trigger('beforeTaskSerialization', ['foo', 'bar']);
+        $worker->trigger('beforeTaskSerialization', [$task]);
     }
 }
 

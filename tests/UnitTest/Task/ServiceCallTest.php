@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Task;
+namespace Test\MyCLabs\Work\UnitTest\Task;
 
 use MyCLabs\Work\Task\ServiceCall;
 use PHPUnit_Framework_TestCase;

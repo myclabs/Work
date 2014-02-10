@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Dispatcher;
+namespace Test\MyCLabs\Work\UnitTest\Dispatcher;
 
 use MyCLabs\Work\Adapter\InMemory\InMemoryWorkDispatcher;
 use PHPUnit_Framework_TestCase;

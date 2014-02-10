@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\TaskExecutor;
+namespace Test\MyCLabs\Work\UnitTest\TaskExecutor;
 
 use MyCLabs\Work\Task\ServiceCall;
 use MyCLabs\Work\TaskExecutor\ServiceCallExecutor;

@@ -1,6 +1,6 @@
 <?php
 
-namespace MyCLabs\Work\Event;
+namespace MyCLabs\Work\Dispatcher\Event;
 
 use MyCLabs\Work\Task\Task;
 

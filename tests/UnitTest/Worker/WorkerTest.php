@@ -1,6 +1,6 @@
 <?php
 
-namespace UnitTest\MyCLabs\Work\Worker;
+namespace Test\MyCLabs\Work\UnitTest\Worker;
 
 use MyCLabs\Work\Task\Task;
 use MyCLabs\Work\TaskExecutor\TaskExecutor;

@@ -2,7 +2,7 @@
 
 namespace MyCLabs\Work\Dispatcher;
 
-use MyCLabs\Work\Event\DispatcherEventListener;
+use MyCLabs\Work\Dispatcher\Event\DispatcherEventListener;
 
 /**
  * Provides event methods for a work dispatcher.

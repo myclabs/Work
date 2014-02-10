@@ -8,7 +8,7 @@ use PhpAmqpLib\Connection\AMQPConnection;
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', true);
 
-require_once __DIR__ . '/../../../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $queue = $argv[1];
 $error = $argv[2];
@@ -30,7 +30,7 @@ $connection = new AMQPConnection('localhost', 5672, 'guest', 'guest');
 $channel = $connection->channel();
 
 $worker = new RabbitMQWorker($channel, $queue);
-$worker->registerTaskExecutor('FunctionalTest\MyCLabs\Work\RabbitMQ\FakeTask', new FakeTaskExecutor());
+$worker->registerTaskExecutor('Test\MyCLabs\Work\FunctionalTest\RabbitMQ\FakeTask', new FakeTaskExecutor());
 
 // Execute 1 task
 $worker->work(1);

@@ -2,16 +2,15 @@
 
 namespace MyCLabs\Work\Worker;
 
-use MyCLabs\Work\EventListener;
-use MyCLabs\Work\Task\Task;
 use MyCLabs\Work\TaskExecutor\TaskExecutor;
+use MyCLabs\Work\Worker\Event\WorkerEventListener;
 
 /**
  * Execute tasks that have been queued.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-abstract class Worker
+interface Worker
 {
     /**
      * Event: after a task is unserialized.
@@ -39,22 +38,11 @@ abstract class Worker
     const EVENT_ON_TASK_ERROR = 'onTaskError';
 
     /**
-     * Executors indexed by task name.
-     * @var TaskExecutor[]
-     */
-    private $executors = [];
-
-    /**
-     * @var EventListener[]
-     */
-    private $listeners = [];
-
-    /**
      * Handle tasks that have been queued
      *
      * @param int $count Number of task to execute. If null, then loop infinitely
      */
-    abstract public function work($count = null);
+    public function work($count = null);
 
     /**
      * Registers an executor that will handle task of a certain type.
@@ -62,48 +50,10 @@ abstract class Worker
      * @param string       $taskType Class name of the task
      * @param TaskExecutor $executor
      */
-    public function registerTaskExecutor($taskType, TaskExecutor $executor)
-    {
-        $this->executors[$taskType] = $executor;
-    }
+    public function registerTaskExecutor($taskType, TaskExecutor $executor);
 
     /**
-     * Returns the executor that handles the given task.
-     *
-     * @param Task $task
-     *
-     * @throws \Exception No executor was configured for given task
-     * @return TaskExecutor|null
+     * @param WorkerEventListener $listener
      */
-    public function getExecutor(Task $task)
-    {
-        $taskType = get_class($task);
-
-        if (array_key_exists($taskType, $this->executors)) {
-            return $this->executors[$taskType];
-        }
-
-        throw new \Exception("No executor was configured for task of type " . get_class($task));
-    }
-
-    /**
-     * @param EventListener $listener
-     */
-    public function addEventListener(EventListener $listener)
-    {
-        $this->listeners[] = $listener;
-    }
-
-    /**
-     * Dispatch an event to all the listeners.
-     *
-     * @param string $event
-     * @param array  $parameters
-     */
-    protected function triggerEvent($event, array $parameters = [])
-    {
-        foreach ($this->listeners as $listener) {
-            call_user_func_array([$listener, $event], $parameters);
-        }
-    }
+    public function registerEventListener(WorkerEventListener $listener);
 }

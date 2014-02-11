@@ -3,6 +3,8 @@
 namespace MyCLabs\Work\Adapter\RabbitMQ;
 
 use Exception;
+use MyCLabs\Work\Worker\WorkerEventTrait;
+use MyCLabs\Work\Worker\WorkerTaskExecutorTrait;
 use MyCLabs\Work\Task\Task;
 use MyCLabs\Work\Worker\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -13,8 +15,11 @@ use PhpAmqpLib\Message\AMQPMessage;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class RabbitMQWorker extends Worker
+class RabbitMQWorker implements Worker
 {
+    use \MyCLabs\Work\Worker\WorkerEventTrait;
+    use \MyCLabs\Work\Worker\WorkerTaskExecutorTrait;
+
     /**
      * @var AMQPChannel
      */

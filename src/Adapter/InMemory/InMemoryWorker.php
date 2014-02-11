@@ -3,6 +3,8 @@
 namespace MyCLabs\Work\Adapter\InMemory;
 
 use Exception;
+use MyCLabs\Work\Worker\WorkerEventTrait;
+use MyCLabs\Work\Worker\WorkerTaskExecutorTrait;
 use MyCLabs\Work\Task\Task;
 use MyCLabs\Work\Worker\Worker;
 
@@ -13,8 +15,11 @@ use MyCLabs\Work\Worker\Worker;
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
  */
-class InMemoryWorker extends Worker
+class InMemoryWorker implements Worker
 {
+    use \MyCLabs\Work\Worker\WorkerEventTrait;
+    use \MyCLabs\Work\Worker\WorkerTaskExecutorTrait;
+
     /**
      * {@inheritdoc}
      */

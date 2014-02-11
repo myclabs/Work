@@ -12,6 +12,8 @@ use PHPUnit_Framework_TestCase;
 
 /**
  * Test executing tasks through RabbitMQ
+ *
+ * @coversNothing
  */
 class RabbitMQTest extends PHPUnit_Framework_TestCase
 {
@@ -69,12 +71,12 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $worker = new RabbitMQWorker($this->channel, $this->queue);
 
         // Check that event methods are called
-        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener = $this->getMock('MyCLabs\Work\Worker\Event\WorkerEventListener');
         $listener->expects($this->once())
             ->method('beforeTaskExecution');
         $listener->expects($this->once())
             ->method('onTaskSuccess');
-        $worker->addEventListener($listener);
+        $worker->registerEventListener($listener);
 
         // Fake task executor
         $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
@@ -99,12 +101,12 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $worker = new RabbitMQWorker($this->channel, $this->queue);
 
         // Check that event methods are called
-        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener = $this->getMock('MyCLabs\Work\Worker\Event\WorkerEventListener');
         $listener->expects($this->once())
             ->method('beforeTaskExecution');
         $listener->expects($this->once())
             ->method('onTaskError');
-        $worker->addEventListener($listener);
+        $worker->registerEventListener($listener);
 
         // Fake task executor
         $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
@@ -218,7 +220,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         exec("php $file {$this->queue} $wait > $log 2> $log &");
 
         // Check that the events are called
-        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener = $this->getMock('MyCLabs\Work\Worker\Event\WorkerEventListener');
         $listener->expects($this->once())
             ->method('afterTaskUnserialization');
         $listener->expects($this->once())
@@ -231,7 +233,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             ->with($this->anything(), true);
         $listener->expects($this->never())
             ->method('onTaskException');
-        $worker->addEventListener($listener);
+        $worker->registerEventListener($listener);
 
         // Execute 1 task
         $worker->work(1);
@@ -264,7 +266,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         exec("php $file {$this->queue} $wait > $log 2> $log &");
 
         // Check that the events are called
-        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener = $this->getMock('MyCLabs\Work\Worker\Event\WorkerEventListener');
         $listener->expects($this->once())
             ->method('afterTaskUnserialization');
         $listener->expects($this->once())
@@ -277,7 +279,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
             ->with($this->anything(), false);
         $listener->expects($this->never())
             ->method('onTaskException');
-        $worker->addEventListener($listener);
+        $worker->registerEventListener($listener);
 
         $worker->work(1);
     }
@@ -300,12 +302,12 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         // Check that the log is empty (no error)
         $this->assertEquals('', $return);
 
-        $listener = $this->getMock('MyCLabs\Work\EventListener');
+        $listener = $this->getMock('MyCLabs\Work\Worker\Event\WorkerEventListener');
         $listener->expects($this->once())
             ->method('onTaskSuccess')
             // Check that $dispatcherNotified = false
             ->with($this->anything(), false);
-        $worker->addEventListener($listener);
+        $worker->registerEventListener($listener);
 
         $worker->work(1);
     }

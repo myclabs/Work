@@ -1,10 +1,16 @@
-# Listening for Work events
+# Listening for events
 
-If you want to execute special behavior for example before or after a task is executed (for example for logging,
-db connections, …), you can implement the EventListener abstract class:
+You can listen to events of
+
+- the work dispatcher (i.e. in the web request)
+- the worker (i.e. in the worker process)
+
+## Work dispatcher events
+
+Example:
 
 ```php
-class MyEventListener extends MyCLabs\Work\EventListener
+class MyEventListener implements \MyCLabs\Work\Dispatcher\Event\DispatcherEventListener
 {
     /**
      * Event called before a task is dispatched to be run by a worker.
@@ -29,7 +35,16 @@ class MyEventListener extends MyCLabs\Work\EventListener
     {
         // ...
     }
+}
+```
 
+## Worker events
+
+Example:
+
+```php
+class MyEventListener extends \MyCLabs\Work\Worker\Event\WorkerEventListener
+{
     /**
      * Event called after a task is unserialized.
      *

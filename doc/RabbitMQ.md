@@ -64,7 +64,8 @@ $error = function (Exception $e) {
     echo "There was an error while completing the operation!";
 }
 
-$workDispatcher->run($task, $wait = 5, $completed, $timeout, $error);
+// Wait for 5 seconds
+$workDispatcher->runAndWait($task, 5, $completed, $timeout, $error);
 ```
 
 On the worker side, you can use the events and the parameter `$dispatcherNotified`:

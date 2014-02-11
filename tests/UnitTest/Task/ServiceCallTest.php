@@ -5,6 +5,9 @@ namespace Test\MyCLabs\Work\UnitTest\Task;
 use MyCLabs\Work\Task\ServiceCall;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @covers \MyCLabs\Work\Task\ServiceCall
+ */
 class ServiceCallTest extends PHPUnit_Framework_TestCase
 {
     public function testGetters()

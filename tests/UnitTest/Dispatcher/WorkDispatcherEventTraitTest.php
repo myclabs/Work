@@ -5,6 +5,9 @@ namespace Test\MyCLabs\Work\UnitTest\Dispatcher;
 use MyCLabs\Work\Dispatcher\WorkDispatcherEventTrait;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @covers \MyCLabs\Work\Dispatcher\WorkDispatcherEventTrait
+ */
 class WorkDispatcherEventTraitTest extends PHPUnit_Framework_TestCase
 {
     public function testTriggerEvent()

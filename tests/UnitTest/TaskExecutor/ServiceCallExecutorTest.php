@@ -6,6 +6,9 @@ use MyCLabs\Work\Task\ServiceCall;
 use MyCLabs\Work\TaskExecutor\ServiceCallExecutor;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @covers \MyCLabs\Work\TaskExecutor\ServiceCallExecutor
+ */
 class ServiceCallExecutorTest extends PHPUnit_Framework_TestCase
 {
     public function testExecute()

@@ -5,6 +5,9 @@ namespace Test\MyCLabs\Work\UnitTest\Adapter\InMemory;
 use MyCLabs\Work\Adapter\InMemory\InMemoryWorker;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @covers \MyCLabs\Work\Adapter\InMemory\InMemoryWorker
+ */
 class InMemoryWorkerTest extends PHPUnit_Framework_TestCase
 {
     public function testExecuteTask()

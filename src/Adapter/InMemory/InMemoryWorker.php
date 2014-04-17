@@ -17,8 +17,8 @@ use MyCLabs\Work\Worker\Worker;
  */
 class InMemoryWorker implements Worker
 {
-    use \MyCLabs\Work\Worker\WorkerEventTrait;
-    use \MyCLabs\Work\Worker\WorkerTaskExecutorTrait;
+    use WorkerEventTrait;
+    use WorkerTaskExecutorTrait;
 
     /**
      * {@inheritdoc}

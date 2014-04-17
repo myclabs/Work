@@ -40,8 +40,8 @@ In some setups, you might want to wait for a task to finish executing.
 
 For example, you may want to execute a task in background and:
 
-- display a message on the webapp (in the HTTP response) if the task finished in less than 5 seconds
-- notify a user later if the task takes more than 5 seconds
+- either display a message on the webapp (in the HTTP response) if the task finished in less than 5 seconds
+- or notify a user by email later if the task takes more than 5 seconds
 
 In short, your webapp will send the task to be run in background, and wait for 5 seconds to see
 if it finishes.

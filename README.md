@@ -75,7 +75,7 @@ class BigComputationExecutor implements MyCLabs\Work\TaskExecutor\TaskExecutor
 The `run($task)` method runs a task in background.
 
 If you want to wait for the result of that task, you have to use a WorkDispatcher that implements the
-`\MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher` interface. For exampel, the RabbitMQ adapter implements this interface.
+`\MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher` interface. For example, the RabbitMQ adapter implements this interface.
 
 That interface offers the `runAndWait` method:
 

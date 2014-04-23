@@ -12,8 +12,6 @@ use PHPUnit_Framework_TestCase;
 
 /**
  * Test executing tasks through RabbitMQ
- *
- * @coversNothing
  */
 class RabbitMQTest extends PHPUnit_Framework_TestCase
 {

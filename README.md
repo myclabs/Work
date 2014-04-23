@@ -9,7 +9,7 @@ It's intent is to be compatible with major work queue solutions (RabbitMQ, Gearm
 
 Current implementations:
 
-- Simple: synchronous implementation, task are executed directly (useful for tests or dev environments)
+- InMemory: synchronous implementation, task are executed directly (useful for tests or dev environments)
 - [RabbitMQ](http://www.rabbitmq.com/)
 
 Feel free to contribute and submit other implementations (Gearman, Beanstalkd, …).

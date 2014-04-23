@@ -29,4 +29,26 @@ class InMemoryWorkerTest extends PHPUnit_Framework_TestCase
         // Check that the result is returned
         $this->assertSame('foo', $result);
     }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage foo
+     */
+    public function testExceptionIsNotSuppressed()
+    {
+        $task = $this->getMockForAbstractClass('MyCLabs\Work\Task\Task');
+
+        $exception = new \RuntimeException('foo');
+
+        // Check that the executor is called with the task as parameter
+        $executor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
+        $executor->expects($this->once())
+            ->method('execute')
+            ->with($task)
+            ->will($this->throwException($exception));
+
+        $worker = new InMemoryWorker();
+        $worker->registerTaskExecutor(get_class($task), $executor);
+        $worker->executeTask($task);
+    }
 }

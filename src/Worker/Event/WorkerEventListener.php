@@ -1,49 +1,16 @@
-# Listening for events
+<?php
 
-You can listen to events of
+namespace MyCLabs\Work\Worker\Event;
 
-- the work dispatcher (i.e. in the web request)
-- the worker (i.e. in the worker process)
+use Exception;
+use MyCLabs\Work\Task\Task;
 
-## Work dispatcher events
-
-Example:
-
-```php
-class MyEventListener implements \MyCLabs\Work\Dispatcher\Event\DispatcherEventListener
-{
-    /**
-     * Event called before a task is dispatched to be run by a worker.
-     *
-     * You can use this event to prepare the task to be sent.
-     *
-     * @param Task $task
-     */
-    public function beforeTaskDispatched(Task $task)
-    {
-        // ...
-    }
-
-    /**
-     * Event called before a task is serialized.
-     *
-     * You can use this event to prepare the task to be serialized.
-     *
-     * @param Task $task
-     */
-    public function beforeTaskSerialization(Task $task)
-    {
-        // ...
-    }
-}
-```
-
-## Worker events
-
-Example:
-
-```php
-class MyEventListener extends \MyCLabs\Work\Worker\Event\WorkerEventListener
+/**
+ * Interface for implementing a listener for worker events.
+ *
+ * @author Matthieu Napoli <matthieu@mnapoli.fr>
+ */
+interface WorkerEventListener
 {
     /**
      * Event called after a task is unserialized.
@@ -52,10 +19,7 @@ class MyEventListener extends \MyCLabs\Work\Worker\Event\WorkerEventListener
      *
      * @param Task $task
      */
-    public function afterTaskUnserialization(Task $task)
-    {
-        // ...
-    }
+    public function afterTaskUnserialization(Task $task);
 
     /**
      * Event called before a task is executed.
@@ -65,10 +29,7 @@ class MyEventListener extends \MyCLabs\Work\Worker\Event\WorkerEventListener
      *
      * @param Task $task
      */
-    public function beforeTaskExecution(Task $task)
-    {
-        // ...
-    }
+    public function beforeTaskExecution(Task $task);
 
     /**
      * Event called after a task is executed (without error).
@@ -78,38 +39,26 @@ class MyEventListener extends \MyCLabs\Work\Worker\Event\WorkerEventListener
      * If an exception is thrown in this method, then the task will be considered as errored
      * and the onTaskException event will be called.
      *
-     * @codeCoverageIgnore
-     *
      * @param Task $task
      */
-    public function beforeTaskFinished(Task $task)
-    {
-        // ...
-    }
+    public function beforeTaskFinished(Task $task);
 
     /**
      * Event called after a task is executed successfully. The task has finished at this point.
      *
      * If an exception is thrown in this method, the worker will blow up!
      *
-     * @codeCoverageIgnore
-     *
      * @param Task $task
      * @param bool $dispatcherNotified If true, then the dispatcher of the task was waiting for the task
      *                                 to execute and was notified that it finished. If false, either
      *                                 the dispatcher wasn't waiting, either it stopped waiting after some time.
      */
-    public function onTaskSuccess(Task $task, $dispatcherNotified)
-    {
-        // ...
-    }
+    public function onTaskSuccess(Task $task, $dispatcherNotified);
 
     /**
      * Event called when a task was executed but threw an exception.
      *
      * If an exception is thrown in this method, the worker will blow up!
-     *
-     * @codeCoverageIgnore
      *
      * @param Task      $task
      * @param Exception $e
@@ -117,9 +66,5 @@ class MyEventListener extends \MyCLabs\Work\Worker\Event\WorkerEventListener
      *                                 to execute and was notified that there was an error. If false, either
      *                                 the dispatcher wasn't waiting, either it stopped waiting after some time.
      */
-    public function onTaskError(Task $task, Exception $e, $dispatcherNotified)
-    {
-        // ...
-    }
+    public function onTaskError(Task $task, Exception $e, $dispatcherNotified);
 }
-```

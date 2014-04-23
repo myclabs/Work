@@ -15,7 +15,7 @@ $workDispatcher = new RabbitMQWorkDispatcher($channel, 'some_queue');
 
 // Run a task in background
 $task = new MyTask();
-$workDispatcher->runBackground($task);
+$workDispatcher->run($task);
 ```
 
 On the worker side (this script is meant to be run continuously as a deamon):
@@ -40,8 +40,8 @@ In some setups, you might want to wait for a task to finish executing.
 
 For example, you may want to execute a task in background and:
 
-- display a message on the webapp (in the HTTP response) if the task finished in less than 5 seconds
-- notify a user later if the task takes more than 5 seconds
+- either display a message on the webapp (in the HTTP response) if the task finished in less than 5 seconds
+- or notify a user by email later if the task takes more than 5 seconds
 
 In short, your webapp will send the task to be run in background, and wait for 5 seconds to see
 if it finishes.
@@ -50,7 +50,7 @@ This can be achieve using this library. Here is a schema of how it works interna
 
 ![Diagram](RabbitMQ-diagram.jpg)
 
-On you client side, you can use `runBackground` like so:
+On you client side, you can use `run` like so:
 
 ```php
 $completed = function () {
@@ -64,7 +64,8 @@ $error = function (Exception $e) {
     echo "There was an error while completing the operation!";
 }
 
-$workDispatcher->runBackground($task, $wait = 5, $completed, $timeout, $error);
+// Wait for 5 seconds
+$workDispatcher->runAndWait($task, 5, $completed, $timeout, $error);
 ```
 
 On the worker side, you can use the events and the parameter `$dispatcherNotified`:

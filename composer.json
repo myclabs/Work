@@ -5,14 +5,19 @@
     "keywords": ["work", "work queue", "task", "distributed", "rabbitmq"],
     "license": "MIT",
     "autoload": {
-        "psr-0": {
-            "MyCLabs": "src/",
-            "FunctionalTest": "tests/",
-            "UnitTest": "tests/"
+        "psr-4": {
+            "MyCLabs\\Work\\": "src/",
+            "Test\\MyCLabs\\Work\\FunctionalTest\\": "tests/FunctionalTest",
+            "Test\\MyCLabs\\Work\\UnitTest\\": "tests/UnitTest"
         }
     },
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
         "videlalvaro/php-amqplib": "~2.0"
+    },
+    "suggest": {
+        "videlalvaro/php-amqplib": "Driver for RabbitMQ"
     }
 }

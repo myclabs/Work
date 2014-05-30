@@ -81,6 +81,8 @@ If you want to wait for the result of that task, you have to use a WorkDispatche
 That interface offers the `runAndWait` method:
 
 ```php
+interface SynchronousWorkDispatcher extends WorkDispatcher
+{
     /**
      * Run a task in background.
      *
@@ -103,6 +105,7 @@ That interface offers the `runAndWait` method:
         callable $timedout = null,
         callable $errored = null
     );
+}
 ```
 
 ## Read more

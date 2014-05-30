@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\MyCLabs\Work\FunctionalTest\RabbitMQ;
+namespace Test\MyCLabs\Work\FunctionalTest;
 
 use MyCLabs\Work\Task\Task;
 

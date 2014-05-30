@@ -9,6 +9,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PHPUnit_Framework_TestCase;
+use Test\MyCLabs\Work\FunctionalTest\FakeTask;
 
 /**
  * Test executing tasks through RabbitMQ
@@ -209,7 +210,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
         $worker = new RabbitMQWorker($this->channel, $this->queue);
         /** @var TaskExecutor $taskExecutor */
         $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
-        $worker->registerTaskExecutor('Test\MyCLabs\Work\FunctionalTest\RabbitMQ\FakeTask', $taskExecutor);
+        $worker->registerTaskExecutor('Test\MyCLabs\Work\FunctionalTest\FakeTask', $taskExecutor);
 
         // Run the task dispatcher as background task (it will emit 1 task and wait for it)
         $file = __DIR__ . '/dispatch-task.php';
@@ -254,7 +255,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
                 // The task executes in 500ms
                 usleep(500000);
             }));
-        $worker->registerTaskExecutor('Test\MyCLabs\Work\FunctionalTest\RabbitMQ\FakeTask', $taskExecutor);
+        $worker->registerTaskExecutor('Test\MyCLabs\Work\FunctionalTest\FakeTask', $taskExecutor);
 
         // Run the task dispatcher as background task (it will emit 1 task and wait for it)
         $file = __DIR__ . '/dispatch-task.php';
@@ -290,7 +291,7 @@ class RabbitMQTest extends PHPUnit_Framework_TestCase
     {
         $worker = new RabbitMQWorker($this->channel, $this->queue);
         $taskExecutor = $this->getMockForAbstractClass('MyCLabs\Work\TaskExecutor\TaskExecutor');
-        $worker->registerTaskExecutor('Test\MyCLabs\Work\FunctionalTest\RabbitMQ\FakeTask', $taskExecutor);
+        $worker->registerTaskExecutor('Test\MyCLabs\Work\FunctionalTest\FakeTask', $taskExecutor);
 
         // Run the task dispatcher and wait for it to timeout and finish
         $file = __DIR__ . '/dispatch-task.php';

@@ -7,6 +7,9 @@ Vagrant.configure("2") do |config|
         v.customize ["modifyvm", :id, "--memory", 1024]
     end
 
+    config.vm.network "private_network", ip: "192.168.50.4"
+    config.vm.synced_folder ".", "/vagrant", type: "nfs"
+
     config.vm.provision :shell, :path => "vagrant/bootstrap.sh"
 
 end

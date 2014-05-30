@@ -34,11 +34,11 @@ class RabbitMQWorkerTest extends PHPUnit_Framework_TestCase
 
     public function range()
     {
-        return array(
-            array(0),
-            array(1),
-            array(2),
-            array(3)
-        );
+        return [
+            [0],
+            [1],
+            [2],
+            [3]
+        ];
     }
 }

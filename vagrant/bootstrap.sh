@@ -13,7 +13,7 @@ apt-key add rabbitmq-signing-key-public.asc
 
 apt-get update
 
-apt-get install -y curl git php5-cli php-pear php5-xdebug rabbitmq-server
+apt-get install -y curl git php5-cli php-pear php5-xdebug rabbitmq-server beanstalkd
 
 # Composer
 curl -sS https://getcomposer.org/installer | php
@@ -22,3 +22,6 @@ mv composer.phar /usr/local/bin/composer
 # PHPUnit
 pear config-set auto_discover 1
 pear install pear.phpunit.de/PHPUnit
+
+# Start beanstalkd
+beanstalkd -l 127.0.0.1 -p 11300 &

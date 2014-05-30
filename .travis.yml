@@ -10,6 +10,8 @@ services:
   - rabbitmq
 
 before_script:
+  - sudo apt-get install -y beanstalkd
+  - sudo beanstalkd -l 127.0.0.1 -p 11300 &
   - composer require satooshi/php-coveralls:dev-master --dev --no-progress --prefer-source
   - mkdir -p build/logs
 

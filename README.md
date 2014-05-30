@@ -17,7 +17,8 @@ Feel free to contribute and submit other implementations (Gearman, …).
 
 Extended guides:
 
-- [Use RabbitMQ with Work](doc/RabbitMQ.md)
+- [The RabbitMQ adapter](doc/RabbitMQ.md)
+- [The Beanstalkd adapter](doc/Beanstalkd.md)
 - [Listening to events](doc/Events.md)
 
 ## How it works
@@ -125,8 +126,9 @@ $ composer install
 $ phpunit
 ```
 
-Some functional tests need external programs like RabbitMQ. For practical reasons, you can boot a VM
-very quickly using Vagrant and the included configuration. You can then run the tests in the VM:
+Some functional tests need external programs like RabbitMQ or Beanstalkd. For practical reasons,
+you can boot a VM very quickly using Vagrant and the included configuration.
+You can then run the tests in the VM:
 
 ```shell
 $ vagrant up

@@ -4,7 +4,7 @@
 
 `Work` is a work queue library letting you run distributed tasks using a generic abstraction.
 
-It's intent is to be compatible with major work queue solutions (RabbitMQ, Gearman, …) while offering a high level abstraction.
+It's intent is to be compatible with major work queue solutions (RabbitMQ, Beanstalkd, …) while offering a high level abstraction.
 
 
 Current implementations:

@@ -123,7 +123,7 @@ You can run the tests with PHPUnit:
 
 ```shell
 $ composer install
-$ phpunit
+$ vendor/bin/phpunit
 ```
 
 Some functional tests need external programs like RabbitMQ or Beanstalkd. For practical reasons,
@@ -135,5 +135,5 @@ $ vagrant up
 $ vagrant ssh
 $ cd /vagrant
 $ composer install
-$ phpunit
+$ vendor/bin/phpunit
 ```

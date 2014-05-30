@@ -1,6 +1,19 @@
 # Using RabbitMQ
 
-This guide is inspired from the official RabbitMQ docs, you should read them first.
+The RabbitMQ adapter uses the [php-amqplib](https://github.com/videlalvaro/php-amqplib) library.
+
+You need to require the library in composer:
+
+```json
+{
+    "require": {
+        "myclabs/work": "*",
+        "videlalvaro/php-amqplib": "~2.0"
+    }
+}
+```
+
+This following is inspired from the official RabbitMQ docs, you should read them first.
 
 On your client side (MVC application for example):
 

@@ -1,6 +1,17 @@
 # Using Beanstalkd
 
-The Beanstalkd implementation uses the [Pheanstalk](https://github.com/pda/pheanstalk) library.
+The Beanstalkd adapter uses the [Pheanstalk](https://github.com/pda/pheanstalk) library.
+
+You need to require the library in composer:
+
+```json
+{
+    "require": {
+        "myclabs/work": "*",
+        "pda/pheanstalk": "~2.0"
+    }
+}
+```
 
 On your client side (MVC application for example):
 

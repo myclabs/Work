@@ -1,0 +1,34 @@
+templateUrl: https://github.com/myclabs/couscous-template
+
+template:
+    # Base URL of the published website
+    baseUrl: http://myclabs.github.io/Work
+
+    github:
+        user: myclabs
+        repo: Work
+
+    title: MyCLabs\Work
+    subTitle: A fantastic work queue library.
+
+    # The left menu bar
+    menu:
+        sections:
+            main:
+                name: Main documentation
+                items:
+                    home:
+                        text: Home
+                        relativeUrl:
+                    foo:
+                        text: Events
+                        relativeUrl: doc/Events.html
+            other:
+                name: Adapters
+                items:
+                    rabbitmq:
+                        text: RabbitMQ
+                        relativeUrl: doc/RabbitMQ.html
+                    beanstalkd:
+                        text: Beanstalkd
+                        relativeUrl: doc/Beanstalkd.html

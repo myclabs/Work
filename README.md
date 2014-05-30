@@ -2,9 +2,9 @@
 
 [![Build Status](https://travis-ci.org/myclabs/Work.png?branch=master)](https://travis-ci.org/myclabs/Work) [![Coverage Status](https://coveralls.io/repos/myclabs/Work/badge.png?branch=master)](https://coveralls.io/r/myclabs/Work?branch=master) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/myclabs/Work/badges/quality-score.png?s=1b6757c137dd42e383dc459edf474bcfdbc935be)](https://scrutinizer-ci.com/g/myclabs/Work/)
 
-`Work` is a work queue library letting you run distributed tasks using a generic abstraction.
+MyCLabs\Work is a work queue library letting you run distributed tasks using a generic abstraction.
 
-It's intent is to be compatible with major work queue solutions (RabbitMQ, Beanstalkd, …) while offering a high level abstraction.
+It's intent is to be compatible with classic work queue solutions (RabbitMQ, Beanstalkd, …) while offering a high level abstraction.
 
 
 Current implementations:

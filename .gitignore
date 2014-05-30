@@ -1,5 +1,5 @@
-.DS_Store
-.idea/*
-vendor/*
+.idea/
+vendor/
 composer.phar
 composer.lock
+couscous/

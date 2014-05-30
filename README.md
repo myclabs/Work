@@ -11,8 +11,9 @@ Current implementations:
 
 - InMemory: synchronous implementation, task are executed directly (useful for tests or dev environments)
 - [RabbitMQ](http://www.rabbitmq.com/)
+- [Beanstalkd](http://kr.github.io/beanstalkd/)
 
-Feel free to contribute and submit other implementations (Gearman, Beanstalkd, …).
+Feel free to contribute and submit other implementations (Gearman, …).
 
 Extended guides:
 

@@ -19,6 +19,7 @@
         "pda/pheanstalk": "~2.0"
     },
     "suggest": {
-        "videlalvaro/php-amqplib": "Driver for RabbitMQ"
+        "videlalvaro/php-amqplib": "Driver for RabbitMQ",
+        "pda/pheanstalk": "Driver for Beanstalkd"
     }
 }

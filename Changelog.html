@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>MyCLabs\Work</title>
+
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/highlight.tomorrow-night.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/main.css">
+
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <header class="navbar navbar-default navbar-fixed-top">
+            <a class="navbar-brand" href="http://myclabs.github.io/Work/">
+                MyCLabs\Work
+                <small class="hidden-xs hidden-sm">
+                    A fantastic work queue library.
+                </small>
+            </a>
+            <a href="https://github.com/myclabs/Work">
+                <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+            </a>
+        </header>
+
+        <main>
+            <div class="container-fluid">
+                <div class="row">
+
+                    <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
+
+                                                    <p class="text-muted">
+                                Main documentation
+                            </p>
+
+                            <ul class="nav nav-pills nav-stacked">
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/">
+                                            Home
+                                        </a>
+                                    </li>
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/Events.html">
+                                            Events
+                                        </a>
+                                    </li>
+                                                            </ul>
+                                                    <p class="text-muted">
+                                Adapters
+                            </p>
+
+                            <ul class="nav nav-pills nav-stacked">
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/RabbitMQ.html">
+                                            RabbitMQ
+                                        </a>
+                                    </li>
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/Beanstalkd.html">
+                                            Beanstalkd
+                                        </a>
+                                    </li>
+                                                            </ul>
+                        
+                        <p>
+                            <iframe class="github-star" src="http://ghbtns.com/github-btn.html?user=myclabs&repo=Work&type=watch&count=true&size=large"
+                                allowtransparency="true" frameborder="0" scrolling="0" width="170" height="30"></iframe>
+                        </p>
+
+                    </nav>
+
+                    <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
+                        <h1>Change log</h1>
+<h2>0.2.0</h2>
+<p>Added support for receiving the exception in the <code>error</code> callback:</p>
+<pre><code class="language-php">$error = function (Exception $e) {
+    echo "There was an error while completing the operation: " . $e-&gt;getMessage();
+}
+
+$workDispatcher-&gt;run($task, 5, null, null, $error);</code></pre>
+<p>However the exception will not be the original exception that made the worker error. The reason for that
+is that it is complex to serialize an exception and transmit it between the worker and the web request.</p>
+<p>It becomes really useful though when using the <code>InMemoryWorkDispatcher</code>, as you will get the original exception here.
+It can help debugging a lot in a development environment.</p>
+<h2>0.1.0</h2>
+<p>First release.</p>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script>
+
+        <script>
+            $(function() {
+                $("section>h1").wrap('<div class="page-header" />');
+                $("section>p:first-child").addClass('lead');
+                hljs.initHighlightingOnLoad();
+            });
+        </script>
+    </body>
+</html>

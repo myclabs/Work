@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>MyCLabs\Work</title>
+
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/highlight.tomorrow-night.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/main.css">
+
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <header class="navbar navbar-default navbar-fixed-top">
+            <a class="navbar-brand" href="http://myclabs.github.io/Work/">
+                MyCLabs\Work
+                <small class="hidden-xs hidden-sm">
+                    A fantastic work queue library.
+                </small>
+            </a>
+            <a href="https://github.com/myclabs/Work">
+                <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+            </a>
+        </header>
+
+        <main>
+            <div class="container-fluid">
+                <div class="row">
+
+                    <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
+
+                                                    <p class="text-muted">
+                                Main documentation
+                            </p>
+
+                            <ul class="nav nav-pills nav-stacked">
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/">
+                                            Home
+                                        </a>
+                                    </li>
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/Events.html">
+                                            Events
+                                        </a>
+                                    </li>
+                                                            </ul>
+                                                    <p class="text-muted">
+                                Adapters
+                            </p>
+
+                            <ul class="nav nav-pills nav-stacked">
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/RabbitMQ.html">
+                                            RabbitMQ
+                                        </a>
+                                    </li>
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/Beanstalkd.html">
+                                            Beanstalkd
+                                        </a>
+                                    </li>
+                                                            </ul>
+                        
+                        <p>
+                            <iframe class="github-star" src="http://ghbtns.com/github-btn.html?user=myclabs&repo=Work&type=watch&count=true&size=large"
+                                allowtransparency="true" frameborder="0" scrolling="0" width="170" height="30"></iframe>
+                        </p>
+
+                    </nav>
+
+                    <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
+                        <h1>Using Beanstalkd</h1>
+<p>The Beanstalkd implementation uses the <a href="https://github.com/pda/pheanstalk">Pheanstalk</a> library.</p>
+<p>On your client side (MVC application for example):</p>
+<pre><code class="language-php">// Connect to the Beanstalkd server
+$connection = new Pheanstalk_Pheanstalk('127.0.0.1');
+// Use the following tube
+$tube = 'my_tube';
+
+$workDispatcher = new BeanstalkdWorkDispatcher($connection, $tube);
+
+// Run a task in background
+$task = new MyTask();
+$workDispatcher-&gt;run($task);</code></pre>
+<p>On the worker side (this script is meant to be run continuously as a deamon):</p>
+<pre><code class="language-php">// Connect to the RabbitMQ server
+$connection = new Pheanstalk_Pheanstalk('127.0.0.1');
+// Use the following tube
+$tube = 'my_tube';
+
+$worker = new BeanstalkdWorker($connection, $tube);
+$worker-&gt;registerTaskExecutor('MyTask', new MyTaskExecutor());
+
+// Execute tasks
+$worker-&gt;work();</code></pre>
+<h2>Waiting for a task to finish</h2>
+<p>The Beanstalkd adapter doesn't support the features provided by the <code>SynchronousWorkDispatcher</code> interface.</p>
+<p>In other words, you can't run a task and wait for it to finish, because Beanstalkd doesn't
+offer that feature.</p>
+<p>If you really need that feature, use another adapter that supports it (for example the RabbitMQ adapter).</p>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script>
+
+        <script>
+            $(function() {
+                $("section>h1").wrap('<div class="page-header" />');
+                $("section>p:first-child").addClass('lead');
+                hljs.initHighlightingOnLoad();
+            });
+        </script>
+    </body>
+</html>

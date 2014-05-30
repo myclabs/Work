@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>MyCLabs\Work</title>
+
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/highlight.tomorrow-night.css">
+        <link rel="stylesheet" href="http://myclabs.github.io/Work/css/main.css">
+
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <header class="navbar navbar-default navbar-fixed-top">
+            <a class="navbar-brand" href="http://myclabs.github.io/Work/">
+                MyCLabs\Work
+                <small class="hidden-xs hidden-sm">
+                    A fantastic work queue library.
+                </small>
+            </a>
+            <a href="https://github.com/myclabs/Work">
+                <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+            </a>
+        </header>
+
+        <main>
+            <div class="container-fluid">
+                <div class="row">
+
+                    <nav id="sidebar" class="col-sm-3 col-lg-2" role="navigation">
+
+                                                    <p class="text-muted">
+                                Main documentation
+                            </p>
+
+                            <ul class="nav nav-pills nav-stacked">
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/">
+                                            Home
+                                        </a>
+                                    </li>
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/Events.html">
+                                            Events
+                                        </a>
+                                    </li>
+                                                            </ul>
+                                                    <p class="text-muted">
+                                Adapters
+                            </p>
+
+                            <ul class="nav nav-pills nav-stacked">
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/RabbitMQ.html">
+                                            RabbitMQ
+                                        </a>
+                                    </li>
+                                                                    <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/Beanstalkd.html">
+                                            Beanstalkd
+                                        </a>
+                                    </li>
+                                                            </ul>
+                        
+                        <p>
+                            <iframe class="github-star" src="http://ghbtns.com/github-btn.html?user=myclabs&repo=Work&type=watch&count=true&size=large"
+                                allowtransparency="true" frameborder="0" scrolling="0" width="170" height="30"></iframe>
+                        </p>
+
+                    </nav>
+
+                    <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
+                        <h1>Work</h1>
+<p><a href="https://travis-ci.org/myclabs/Work"><img alt="Build Status" src="https://travis-ci.org/myclabs/Work.png?branch=master" /></a> <a href="https://coveralls.io/r/myclabs/Work?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/myclabs/Work/badge.png?branch=master" /></a> <a href="https://scrutinizer-ci.com/g/myclabs/Work/"><img alt="Scrutinizer Quality Score" src="https://scrutinizer-ci.com/g/myclabs/Work/badges/quality-score.png?s=1b6757c137dd42e383dc459edf474bcfdbc935be" /></a></p>
+<p>MyCLabs\Work is a work queue library letting you run distributed tasks using a generic abstraction.</p>
+<p>It's intent is to be compatible with classic work queue solutions (RabbitMQ, Beanstalkd, …) while offering a high level abstraction.</p>
+<p>Current implementations:</p>
+<ul>
+<li>InMemory: synchronous implementation, task are executed directly (useful for tests or dev environments)</li>
+<li><a href="http://www.rabbitmq.com/">RabbitMQ</a></li>
+<li><a href="http://kr.github.io/beanstalkd/">Beanstalkd</a></li>
+</ul>
+<p>Feel free to contribute and submit other implementations (Gearman, …).</p>
+<p>Extended guides:</p>
+<ul>
+<li><a href="doc/RabbitMQ.html">The RabbitMQ adapter</a></li>
+<li><a href="doc/Beanstalkd.html">The Beanstalkd adapter</a></li>
+<li><a href="doc/Events.html">Listening to events</a></li>
+</ul>
+<h2>How it works</h2>
+<p>In you code (HTTP request for example), you can run a task in background:</p>
+<pre><code class="language-php">$workDispatcher = new RabbitMQWorkDispatcher(/* parameters */);
+$workDispatcher-&gt;run(new MyTask());</code></pre>
+<p>Separately, you set up a worker to run continuously on the command line (like a deamon):</p>
+<pre><code class="language-shell">$ php my-worker.php</code></pre>
+<p>This worker simply calls:</p>
+<pre><code class="language-php">// my-worker.php
+$worker = new RabbitMQWorker(/* parameters */);
+// Will loop continuously and execute tasks
+$worker-&gt;work();</code></pre>
+<h3>Defining tasks</h3>
+<p>Define a task:</p>
+<pre><code class="language-php">class BigComputation implements MyCLabs\Work\Task\Task
+{
+    public $parameter1;
+}</code></pre>
+<p>And define the code that executes the task:</p>
+<pre><code class="language-php">class BigComputationExecutor implements MyCLabs\Work\TaskExecutor\TaskExecutor
+{
+    public function execute(Task $task)
+    {
+        if (! $task instanceof BigComputation) {
+            throw new \Exception("Invalid task type provided");
+        }
+        // Perform the action (here we just multiply the parameter by 2)
+        return $task-&gt;parameter1 * 2;
+    }
+}</code></pre>
+<h2>Execute a task and wait for its result</h2>
+<p>The <code>run($task)</code> method runs a task in background.</p>
+<p>If you want to wait for the result of that task, you have to use a WorkDispatcher that implements the
+<code>\MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher</code> interface. For example, the RabbitMQ adapter implements this interface.</p>
+<p>That interface offers the <code>runAndWait</code> method:</p>
+<pre><code class="language-php">interface SynchronousWorkDispatcher extends WorkDispatcher
+{
+    /**
+     * Run a task in background.
+     *
+     * You can use $wait to wait a given time for the task to complete.
+     * If the task hasn't finished during this time, $timedout will be
+     * called and this method will return.
+     * If the task has finished, $completed will be called.
+     *
+     * @param Task     $task
+     * @param int      $wait      Number of seconds to wait for the task to complete.
+     *                            If 0, doesn't wait.
+     * @param callable $completed Called (if $wait &gt; 0) when the task has completed.
+     * @param callable $timedout  Called (if $wait &gt; 0) if we hit the timeout while
+     *                            waiting.
+     * @param callable $errored   Called (if $wait &gt; 0) if the task errors. Takes 1
+     *                            parameter which is the exception.
+     *
+     * @return void No results
+     */
+    public function runAndWait(
+        Task $task,
+        $wait = 0,
+        callable $completed = null,
+        callable $timedout = null,
+        callable $errored = null
+    );
+}</code></pre>
+<h2>Read more</h2>
+<p>Read more in <a href="doc/">the docs</a>.</p>
+<h2>Contributing</h2>
+<p>You can run the tests with PHPUnit:</p>
+<pre><code class="language-shell">$ composer install
+$ vendor/bin/phpunit</code></pre>
+<p>Some functional tests need external programs like RabbitMQ or Beanstalkd. For practical reasons,
+you can boot a VM very quickly using Vagrant and the included configuration.
+You can then run the tests in the VM:</p>
+<pre><code class="language-shell">$ vagrant up
+$ vagrant ssh
+$ cd /vagrant
+$ composer install
+$ vendor/bin/phpunit</code></pre>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script>
+
+        <script>
+            $(function() {
+                $("section>h1").wrap('<div class="page-header" />');
+                $("section>p:first-child").addClass('lead');
+                hljs.initHighlightingOnLoad();
+            });
+        </script>
+    </body>
+</html>

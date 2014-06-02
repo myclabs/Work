@@ -77,42 +77,24 @@
                     </nav>
 
                     <section class="col-sm-offset-3 col-lg-offset-2 col-sm-9 col-lg-10">
-                        <h1>Using Beanstalkd</h1>
-<p>The Beanstalkd adapter uses the <a href="https://github.com/pda/pheanstalk">Pheanstalk</a> library.</p>
-<p>You need to require the library in composer:</p>
-<pre><code class="language-json">{
-    "require": {
-        "myclabs/work": "*",
-        "pda/pheanstalk": "~2.0"
-    }
-}</code></pre>
-<p>On your client side (MVC application for example):</p>
-<pre><code class="language-php">// Connect to the Beanstalkd server
-$connection = new Pheanstalk_Pheanstalk('127.0.0.1');
-// Use the following tube
-$tube = 'my_tube';
+                        <h1>Synchronous implementation</h1>
+<p>The <code>InMemory</code> adapter doesn't use any work queue. All the tasks are executed immediately and
+synchronously in the same process.</p>
+<p>This implementation is useful if you don't want to install a work queue on your development machine,
+or in tests too.</p>
+<p>It implements the same interface as the other adapters, so you can use it the same way:</p>
+<pre><code class="language-php">$workDispatcher = new InMemoryWorkDispatcher(new InMemoryWorker());
 
-$workDispatcher = new BeanstalkdWorkDispatcher($connection, $tube);
-
-// Run a task in background
+// Run a task
 $task = new MyTask();
 $workDispatcher-&gt;run($task);</code></pre>
-<p>On the worker side (this script is meant to be run continuously as a deamon):</p>
-<pre><code class="language-php">// Connect to the RabbitMQ server
-$connection = new Pheanstalk_Pheanstalk('127.0.0.1');
-// Use the following tube
-$tube = 'my_tube';
-
-$worker = new BeanstalkdWorker($connection, $tube);
-$worker-&gt;registerTaskExecutor('MyTask', new MyTaskExecutor());
-
-// Execute tasks
-$worker-&gt;work();</code></pre>
+<p>There is (obviously) no need for a worker, since the worker is already running in the same
+process.</p>
+<p>This is basically the same as executing the task directly.</p>
 <h2>Waiting for a task to finish</h2>
-<p>The Beanstalkd adapter doesn't support the features provided by the <code>SynchronousWorkDispatcher</code> interface.</p>
-<p>In other words, you can't run a task and wait for it to finish, because Beanstalkd doesn't
-offer that feature.</p>
-<p>If you really need that feature, use another adapter that supports it (for example the RabbitMQ adapter).</p>
+<p>The <code>InMemory</code> adapter also implements the <code>SynchronousWorkDispatcher</code> interface, which
+allows to run tasks and fetch its result:</p>
+<pre><code class="language-php">$result = $workDispatcher-&gt;runAndWait(new MyTask());</code></pre>
                     </section>
 
                 </div>

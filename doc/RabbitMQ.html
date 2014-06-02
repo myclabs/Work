@@ -53,6 +53,11 @@
 
                             <ul class="nav nav-pills nav-stacked">
                                                                     <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/InMemory.html">
+                                            InMemory
+                                        </a>
+                                    </li>
+                                                                    <li class="">
                                         <a href="http://myclabs.github.io/Work/doc/RabbitMQ.html">
                                             RabbitMQ
                                         </a>
@@ -115,14 +120,15 @@ $worker-&gt;work();</code></pre>
 </ul>
 <p>In short, your webapp will send the task to be run in background, and wait for 5 seconds to see
 if it finishes.</p>
-<p>This can be achieve using this library. Here is a schema of how it works internally using RabbitMQ:</p>
+<p>The RabbitMQ adapter implements the <code>SynchronousWorkDispatcher</code> which makes that possible.</p>
+<p>Here is a schema of how it works internally using RabbitMQ:</p>
 <p><img alt="Diagram" src="RabbitMQ-diagram.jpg" /></p>
-<p>On you client side, you can use <code>run</code> like so:</p>
+<p>On you client side, you can use <code>runAndWait</code> like so:</p>
 <pre><code class="language-php">$completed = function () {
     echo "The operation has completed.";
 }
 $timeout = function () {
-    echo "The operation is being applied. You will be notified when it has completed.";
+    echo "The operation is being applied. You will be emailed when it has completed.";
     // to notify the user, see below
 }
 $error = function (Exception $e) {
@@ -131,18 +137,23 @@ $error = function (Exception $e) {
 
 // Wait for 5 seconds
 $workDispatcher-&gt;runAndWait($task, 5, $completed, $timeout, $error);</code></pre>
-<p>On the worker side, you can use the events and the parameter <code>$dispatcherNotified</code>:</p>
+<p>This will run the task in the worker and wait for 5 seconds for a result.
+If the worker finishes in less than 5 seconds, then the <code>$completed</code> or <code>$error</code> callback
+will be called. Else, the <code>$timeout</code> callback will be called.</p>
+<p>On the worker side, you can use events to email the user depending on whether the task finished in
+less than 5 seconds or not:</p>
 <pre><code class="language-php">public function onTaskSuccess(Task $task, $dispatcherNotified)
 {
+    // If the request that sent the task wasn't notified that the task was over
+    // (i.e. if the task took more than 5 seconds)
     if (!$dispatcherNotified) {
-        // The user is notified only if he didn't see "The operation has completed." (see above)
+        // Then we send an email to the user to alert him/her
         sendEmailToUser("The operation has now completed.");
     }
 }
 public function onTaskError(Task $task, Exception $e, $dispatcherNotified)
 {
     if (!$dispatcherNotified) {
-        // The user is notified only if he didn't see "The operation has completed." (see above)
         sendEmailToUser("There was an error while completing the operation!");
     }
 }</code></pre>

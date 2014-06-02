@@ -53,6 +53,11 @@
 
                             <ul class="nav nav-pills nav-stacked">
                                                                     <li class="">
+                                        <a href="http://myclabs.github.io/Work/doc/InMemory.html">
+                                            InMemory
+                                        </a>
+                                    </li>
+                                                                    <li class="">
                                         <a href="http://myclabs.github.io/Work/doc/RabbitMQ.html">
                                             RabbitMQ
                                         </a>
@@ -87,6 +92,7 @@
 <p>Feel free to contribute and submit other implementations (Gearman, …).</p>
 <p>Extended guides:</p>
 <ul>
+<li><a href="doc/InMemory.html">The InMemory adapter</a></li>
 <li><a href="doc/RabbitMQ.html">The RabbitMQ adapter</a></li>
 <li><a href="doc/Beanstalkd.html">The Beanstalkd adapter</a></li>
 <li><a href="doc/Events.html">Listening to events</a></li>
@@ -123,7 +129,8 @@ $worker-&gt;work();</code></pre>
 <h2>Execute a task and wait for its result</h2>
 <p>The <code>run($task)</code> method runs a task in background.</p>
 <p>If you want to wait for the result of that task, you have to use a WorkDispatcher that implements the
-<code>\MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher</code> interface. For example, the RabbitMQ adapter implements this interface.</p>
+<code>\MyCLabs\Work\Dispatcher\SynchronousWorkDispatcher</code> interface.
+For example, the RabbitMQ adapter implements this interface.</p>
 <p>That interface offers the <code>runAndWait</code> method:</p>
 <pre><code class="language-php">interface SynchronousWorkDispatcher extends WorkDispatcher
 {

@@ -26,6 +26,9 @@ template:
             other:
                 name: Adapters
                 items:
+                    inmemory:
+                        text: InMemory
+                        relativeUrl: doc/InMemory.html
                     rabbitmq:
                         text: RabbitMQ
                         relativeUrl: doc/RabbitMQ.html

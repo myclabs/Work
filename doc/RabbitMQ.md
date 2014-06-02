@@ -59,18 +59,20 @@ For example, you may want to execute a task in background and:
 In short, your webapp will send the task to be run in background, and wait for 5 seconds to see
 if it finishes.
 
-This can be achieve using this library. Here is a schema of how it works internally using RabbitMQ:
+The RabbitMQ adapter implements the `SynchronousWorkDispatcher` which makes that possible.
+
+Here is a schema of how it works internally using RabbitMQ:
 
 ![Diagram](RabbitMQ-diagram.jpg)
 
-On you client side, you can use `run` like so:
+On you client side, you can use `runAndWait` like so:
 
 ```php
 $completed = function () {
     echo "The operation has completed.";
 }
 $timeout = function () {
-    echo "The operation is being applied. You will be notified when it has completed.";
+    echo "The operation is being applied. You will be emailed when it has completed.";
     // to notify the user, see below
 }
 $error = function (Exception $e) {
@@ -81,20 +83,26 @@ $error = function (Exception $e) {
 $workDispatcher->runAndWait($task, 5, $completed, $timeout, $error);
 ```
 
-On the worker side, you can use the events and the parameter `$dispatcherNotified`:
+This will run the task in the worker and wait for 5 seconds for a result.
+If the worker finishes in less than 5 seconds, then the `$completed` or `$error` callback
+will be called. Else, the `$timeout` callback will be called.
+
+On the worker side, you can use events to email the user depending on whether the task finished in
+less than 5 seconds or not:
 
 ```php
 public function onTaskSuccess(Task $task, $dispatcherNotified)
 {
+    // If the request that sent the task wasn't notified that the task was over
+    // (i.e. if the task took more than 5 seconds)
     if (!$dispatcherNotified) {
-        // The user is notified only if he didn't see "The operation has completed." (see above)
+        // Then we send an email to the user to alert him/her
         sendEmailToUser("The operation has now completed.");
     }
 }
 public function onTaskError(Task $task, Exception $e, $dispatcherNotified)
 {
     if (!$dispatcherNotified) {
-        // The user is notified only if he didn't see "The operation has completed." (see above)
         sendEmailToUser("There was an error while completing the operation!");
     }
 }

@@ -11,8 +11,8 @@ It's intent is to be compatible with classic work queue solutions (RabbitMQ, Bea
 Current implementations:
 
 - InMemory: synchronous implementation, task are executed directly (useful for tests or dev environments)
-- [RabbitMQ](http://www.rabbitmq.com/)
-- [Beanstalkd](http://kr.github.io/beanstalkd/)
+- [RabbitMQ](https://www.rabbitmq.com/)
+- [Beanstalkd](https://kr.github.io/beanstalkd/)
 
 Feel free to contribute and submit other implementations (Gearman, …).
 

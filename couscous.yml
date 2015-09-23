@@ -2,7 +2,7 @@ templateUrl: https://github.com/myclabs/couscous-template
 
 template:
     # Base URL of the published website
-    baseUrl: http://myclabs.github.io/Work
+    baseUrl: https://myclabs.github.io/Work
 
     github:
         user: myclabs

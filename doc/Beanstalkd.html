@@ -98,7 +98,7 @@ $workDispatcher = new BeanstalkdWorkDispatcher($connection, $tube);
 $task = new MyTask();
 $workDispatcher-&gt;run($task);</code></pre>
 <p>On the worker side (this script is meant to be run continuously as a deamon):</p>
-<pre><code class="language-php">// Connect to the RabbitMQ server
+<pre><code class="language-php">// Connect to the Beanstalkd server
 $connection = new Pheanstalk_Pheanstalk('127.0.0.1');
 // Use the following tube
 $tube = 'my_tube';
